@@ -15,7 +15,7 @@ export function Button(props: PropsWithChildren<ButtonProps>) {
             enabled={enabled}
             onPress={props.onPress}
         >
-            <View>
+            <View className="flex flex-row justify-center items-center bg-primary">
                 <ActivityIndicator animating={!!props.loading} />
                 <Text>{props.children}</Text>
             </View>
