@@ -1,0 +1,6 @@
+{
+    "tabWidth": 4,
+    "endOfLine": "crlf",
+    "singleAttributePerLine": true,
+    "bracketSameLine": false
+}
