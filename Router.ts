@@ -1,7 +1,8 @@
 import { createStaticNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SignIn from "./screens/SignIn";
-import { useIsSignedOut } from "./hooks/useIsSigned";
+import { useIsSignedIn, useIsSignedOut } from "./hooks/useIsSigned";
+import Home from "./screens/Home";
 
 const RootStack = createNativeStackNavigator({
     groups: {
@@ -9,6 +10,15 @@ const RootStack = createNativeStackNavigator({
             if: useIsSignedOut,
             screens: {
                 SignIn,
+            },
+            screenOptions: {
+                headerShadowVisible: false,
+            },
+        },
+        SignedIn: {
+            if: useIsSignedIn,
+            screens: {
+                Home,
             },
         },
     },

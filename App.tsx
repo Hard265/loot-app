@@ -1,3 +1,5 @@
+import "./global.css";
+
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useMemo, useReducer } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
