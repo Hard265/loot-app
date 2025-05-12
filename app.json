@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.hard_265.loot"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -28,6 +29,12 @@
     "plugins": [
       "expo-secure-store",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1c90244a-c26e-4cdb-8af1-6ef32f3238d4"
+      }
+    },
+    "owner": "hard_265"
   }
 }

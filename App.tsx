@@ -8,8 +8,12 @@ import { AuthContext } from "./contexts/AuthContext";
 import { SignInContext } from "./contexts/SignInContext";
 import { login, UserData } from "./services/userApi";
 import { deleteToken, setToken } from "./services/api";
+import { DarkTheme, DefaultTheme } from "@react-navigation/native";
+import { useColorScheme } from "react-native";
 
 export default function App() {
+    const colorScheme = useColorScheme();
+
     const [state, dispatch] = useReducer(
         (prevState, action) => {
             switch (action.type) {
@@ -39,7 +43,7 @@ export default function App() {
             isLoading: true,
             isSignout: false,
             userToken: null,
-        },
+        }
     );
 
     useEffect(() => {
@@ -70,7 +74,7 @@ export default function App() {
                 dispatch({ type: "SIGN_OUT" });
             },
         }),
-        [],
+        []
     );
 
     if (state.isLoading) return null;
@@ -81,9 +85,13 @@ export default function App() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <AuthContext.Provider value={authContext}>
                 <SignInContext.Provider value={isSignedIn}>
-                    <Navigation />
+                    <Navigation theme={getTheme(colorScheme === "dark")} />
                 </SignInContext.Provider>
             </AuthContext.Provider>
         </GestureHandlerRootView>
     );
+}
+
+function getTheme(dark: boolean) {
+    return dark ? DarkTheme : DefaultTheme;
 }
