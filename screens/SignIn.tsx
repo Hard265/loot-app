@@ -46,7 +46,7 @@ export default function SignIn() {
             <Field>
                 <Label>Password</Label>
                 <Input
-                    value={formState.email}
+                    value={formState.password}
                     onChange={(password) =>
                         setFormState((prevState) => ({
                             ...prevState,
