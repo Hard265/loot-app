@@ -1,7 +1,9 @@
 import { PropsWithChildren } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { cssInterop } from "nativewind";
+import clsx from "clsx";
+import Text from "./Text";
 
 cssInterop(RectButton, { className: "style" });
 
@@ -11,16 +13,27 @@ interface ButtonProps {
     onPress?(): void;
 }
 export function Button(props: PropsWithChildren<ButtonProps>) {
-    const enabled = !props.disabled || !props.loading;
+    const enabled = !props.disabled && !props.loading;
 
     return (
         <RectButton
             enabled={enabled}
             onPress={props.onPress}
-            className="flex flex-row justify-center items-center p-3 gap-4 bg-primary"
         >
-            <ActivityIndicator animating={!!props.loading} />
-            <Text className="text-text text-base">{props.children}</Text>
+            <View
+                className={clsx(
+                    "flex flex-row items-center justify-center gap-4 bg-primary p-2.5 px-4 shadow-sm shadow-text",
+                    { "opacity-75": !enabled },
+                )}
+            >
+                {!!props.loading && <ActivityIndicator />}
+                <Text
+                    variant="label"
+                    color="tertiary"
+                >
+                    {props.children}
+                </Text>
+            </View>
         </RectButton>
     );
 }
@@ -33,9 +46,13 @@ export function ButtonOutlined(props: PropsWithChildren<ButtonProps>) {
             enabled={enabled}
             onPress={props.onPress}
         >
-            <View>
-                <ActivityIndicator animating={!!props.loading} />
-                <Text>{props.children}</Text>
+            <View className="flex flex-row items-center justify-center gap-4 border border-gray-300 bg-background p-2.5 px-4 shadow dark:border-text/75">
+                <Text
+                    variant="label"
+                    color="secondary"
+                >
+                    {props.children}
+                </Text>
             </View>
         </RectButton>
     );

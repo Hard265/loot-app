@@ -18,7 +18,7 @@ function Input(props: InputProps) {
             onChangeText={props.onChange}
             secureTextEntry={props.password}
             keyboardType={props.type}
-            className="flex flex-row border focus:border-primary p-3"
+            className="flex flex-row border border-text/50 bg-background p-3 font-[MontrealRegular] text-base shadow color-text focus:border-2 focus:border-primary dark:border-text/50"
         />
     );
 }

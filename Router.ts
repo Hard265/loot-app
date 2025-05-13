@@ -3,16 +3,27 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SignIn from "./screens/SignIn";
 import { useIsSignedIn, useIsSignedOut } from "./hooks/useIsSigned";
 import Home from "./screens/Home";
+import Register from "./screens/Register";
+import PasswordReset from "./screens/PasswordReset";
+
+type RootStackT = {
+    SignIn: undefined;
+    Home: undefined;
+    Register: undefined;
+    ResetPassword: {
+        email?: string;
+    };
+};
 
 const RootStack = createNativeStackNavigator({
     groups: {
         SignedOut: {
             if: useIsSignedOut,
-            screens: {
-                SignIn,
-            },
+            screens: { SignIn, Register, PasswordReset },
             screenOptions: {
                 headerShadowVisible: false,
+                animation: "slide_from_right",
+                title: "",
             },
         },
         SignedIn: {
@@ -25,4 +36,4 @@ const RootStack = createNativeStackNavigator({
 });
 
 const Navigation = createStaticNavigation(RootStack);
-export default Navigation;
+export { Navigation as default, RootStackT };

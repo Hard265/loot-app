@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --color-primary: "97 95 255";
+        --color-background: "255 255 255";
+        --color-text: "0 0 0";
+        --color-gray: "209 213 219";
+        --color-error: "239 68 68";
+        --color-foreground-primary: "255 255 255";
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --color-primary: "124 134 255";
+            --color-background: "0 0 0";
+            --color-text: "255 255 255";
+            --color-error: "248 113 133";
+            --color-gray: "209 213 219";
+            --color-foreground-primary: "255 255 255";
+        }
+    }
+}

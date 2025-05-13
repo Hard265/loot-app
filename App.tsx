@@ -8,11 +8,17 @@ import { AuthContext } from "./contexts/AuthContext";
 import { SignInContext } from "./contexts/SignInContext";
 import { login, UserData } from "./services/userApi";
 import { deleteToken, setToken } from "./services/api";
-import { DarkTheme, DefaultTheme } from "@react-navigation/native";
+import { DarkTheme, DefaultTheme, Theme } from "@react-navigation/native";
 import { useColorScheme } from "react-native";
+import { useFonts } from "expo-font";
 
 export default function App() {
     const colorScheme = useColorScheme();
+    const [fontsLoaded, fontsErr] = useFonts({
+        RoobertBold: require("./assets/fonts/Roobert-Bold.otf"),
+        MontrealRegular: require("./assets/fonts/NeueMontreal-Regular.otf"),
+        MontrealMedium: require("./assets/fonts/NeueMontreal-Medium.otf"),
+    });
 
     const [state, dispatch] = useReducer(
         (prevState, action) => {
@@ -43,7 +49,7 @@ export default function App() {
             isLoading: true,
             isSignout: false,
             userToken: null,
-        }
+        },
     );
 
     useEffect(() => {
@@ -74,12 +80,16 @@ export default function App() {
                 dispatch({ type: "SIGN_OUT" });
             },
         }),
-        []
+        [],
     );
 
     if (state.isLoading) return null;
 
     const isSignedIn = state.userToken != null;
+
+    if (!fontsLoaded || fontsErr) {
+        return null;
+    }
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
@@ -92,6 +102,8 @@ export default function App() {
     );
 }
 
-function getTheme(dark: boolean) {
-    return dark ? DarkTheme : DefaultTheme;
+function getTheme(dark: boolean): Theme {
+    return dark
+        ? { ...DarkTheme, colors: { ...DarkTheme.colors, card: "#000" } }
+        : DefaultTheme;
 }

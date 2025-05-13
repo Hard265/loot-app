@@ -2,9 +2,11 @@ import { Button, ButtonOutlined } from "@/components/Button";
 import { Field } from "@/components/Field";
 import { Input } from "@/components/Input";
 import { Label } from "@/components/Label";
+import Text from "@/components/Text";
 import useAuth from "@/hooks/useAuth";
+import { Link } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, Text } from "react-native";
+import { ScrollView, View } from "react-native";
 
 export default function SignIn() {
     const { signIn } = useAuth();
@@ -14,16 +16,24 @@ export default function SignIn() {
         password: "",
     });
 
-    const [errors, setErrors] = useState({
+    const [err, setErr] = useState({
         detail: "",
     });
 
     const handleSignin = async () => {
         setPending(true);
         try {
-            signIn(formState);
-        } catch (err) {
-            console.log(err);
+            await signIn(formState);
+        } catch (err: any) {
+            if (
+                err.response &&
+                err.response.status === 400 &&
+                err.response.data?.detail
+            ) {
+                setErr(err.response.data.detail);
+            } else {
+                console.log(err);
+            }
         } finally {
             setPending(false);
         }
@@ -33,14 +43,29 @@ export default function SignIn() {
         [formState.email, formState.password].every(Boolean) && !pending;
 
     return (
-        <ScrollView>
+        <ScrollView
+            className="bg-background"
+            contentContainerClassName="flex flex-col"
+        >
+            <View className="mb-12 p-2">
+                <Text
+                    variant="largeTitle"
+                    color="secondary"
+                >
+                    Sign In
+                </Text>
+            </View>
             <Field>
                 <Label>Email address</Label>
                 <Input
                     value={formState.email}
                     onChange={(email) =>
-                        setFormState((prevState) => ({ ...prevState, email }))
+                        setFormState((prevState) => ({
+                            ...prevState,
+                            email,
+                        }))
                     }
+                    type="email-address"
                 />
             </Field>
             <Field>
@@ -53,18 +78,54 @@ export default function SignIn() {
                             password,
                         }))
                     }
+                    password
                 />
             </Field>
-            <Button
-                loading={pending}
-                disabled={!allowSubmit}
-                onPress={handleSignin}
-            >
-                Sign In
-            </Button>
-            <Text>Need an account? Sign up</Text>
-            <Text>Forgot your password Reset it</Text>
-            <ButtonOutlined>Sign In with Google</ButtonOutlined>
+            <View className="my-2 flex flex-row p-2">
+                <Button
+                    loading={pending}
+                    disabled={!allowSubmit}
+                    onPress={handleSignin}
+                >
+                    Sign In
+                </Button>
+            </View>
+            <View className="flex flex-col gap-4 p-2">
+                <Link
+                    screen="Register"
+                    params={{}}
+                >
+                    <Text color="primary">Sign in with SSO</Text>
+                </Link>
+                <Text
+                    variant="body"
+                    color="secondary"
+                >
+                    Need an account?{" "}
+                    <Link
+                        screen="Register"
+                        params={{}}
+                    >
+                        <Text color="primary">Sign up</Text>
+                    </Link>
+                </Text>
+                {/* <Text>{toRgb(colors.gray[300], { format: "css" })}</Text> */}
+                <Text
+                    variant="body"
+                    color="secondary"
+                >
+                    Forgot your password?{" "}
+                    <Link
+                        screen="PasswordReset"
+                        params={{ email: formState.email }}
+                    >
+                        <Text color="primary">Reset it</Text>
+                    </Link>
+                </Text>
+                <View className="flex flex-row">
+                    <ButtonOutlined>Sign In with Google</ButtonOutlined>
+                </View>
+            </View>
         </ScrollView>
     );
 }

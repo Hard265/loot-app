@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
-import { Text } from "react-native";
 import useField from "./hooks/useField";
+import Text from "./Text";
 
 interface LabelProps {
     passive?: boolean;
@@ -9,7 +9,14 @@ interface LabelProps {
 function Label({ children, ...props }: PropsWithChildren<LabelProps>) {
     const { disabled } = useField();
 
-    return <Text>{children}</Text>;
+    return (
+        <Text
+            variant="label"
+            color="secondary"
+        >
+            {children}
+        </Text>
+    );
 }
 
 export { Label };
