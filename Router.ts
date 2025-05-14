@@ -40,7 +40,7 @@ const RootStack = createNativeStackNavigator({
     screenListeners(props) {
         return {
             focus(e) {
-                console.log(e.target, e.data);
+                // console.log(e.target, e.data);
             },
         };
     },

@@ -12,6 +12,8 @@ import { SignInContext } from "./contexts/SignInContext";
 import { deleteToken, setToken } from "./services/api";
 import { login, register, UserData } from "./services/userApi";
 import store from "./stores";
+import { setBackgroundColorAsync } from "expo-system-ui";
+import colors from "tailwindcss/colors";
 
 export default function App() {
     const colorScheme = useColorScheme();
@@ -20,6 +22,15 @@ export default function App() {
         MontrealRegular: require("./assets/fonts/NeueMontreal-Regular.otf"),
         MontrealMedium: require("./assets/fonts/NeueMontreal-Medium.otf"),
     });
+
+    useEffect(() => {
+        const bootstrapAsync = async () => {
+            await setBackgroundColorAsync(
+                getTheme(colorScheme === "dark").colors.background,
+            );
+        };
+        bootstrapAsync();
+    }, [colorScheme]);
 
     const [state, dispatch] = useReducer(
         (prevState, action) => {
@@ -119,6 +130,16 @@ export default function App() {
 
 function getTheme(dark: boolean): Theme {
     return dark
-        ? { ...DarkTheme, colors: { ...DarkTheme.colors, card: "#000" } }
-        : DefaultTheme;
+        ? {
+              ...DarkTheme,
+              colors: {
+                  ...DarkTheme.colors,
+                  background: colors.black,
+                  card: colors.black,
+              },
+          }
+        : {
+              ...DefaultTheme,
+              colors: { ...DefaultTheme.colors, background: colors.white },
+          };
 }
