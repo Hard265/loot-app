@@ -1,5 +1,6 @@
 import { TextInput, TextInputProps } from "react-native";
 import useField from "./hooks/useField";
+import clsx from "clsx";
 
 interface InputProps {
     value?: string;
@@ -9,7 +10,9 @@ interface InputProps {
 }
 
 function Input(props: InputProps) {
-    const { disabled } = useField();
+    const { disabled, errors } = useField();
+
+    const hasErrors = errors.length > 0;
 
     return (
         <TextInput
@@ -18,7 +21,10 @@ function Input(props: InputProps) {
             onChangeText={props.onChange}
             secureTextEntry={props.password}
             keyboardType={props.type}
-            className="flex flex-row border border-text/50 bg-background p-3 font-[MontrealRegular] text-base shadow color-text focus:border-2 focus:border-primary dark:border-text/50"
+            className={clsx(
+                "flex flex-row border border-text/50 bg-background p-3 font-[MontrealRegular] text-base shadow color-text focus:border-2 focus:border-primary dark:border-text/50",
+                { "!border-error": hasErrors },
+            )}
         />
     );
 }

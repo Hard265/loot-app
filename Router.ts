@@ -5,6 +5,7 @@ import { useIsSignedIn, useIsSignedOut } from "./hooks/useIsSigned";
 import Home from "./screens/Home";
 import Register from "./screens/Register";
 import PasswordReset from "./screens/PasswordReset";
+import PlusFabLayout from "./layouts/PlusFabLayout";
 
 type RootStackT = {
     SignIn: undefined;
@@ -32,6 +33,16 @@ const RootStack = createNativeStackNavigator({
                 Home,
             },
         },
+    },
+    layout(props) {
+        return PlusFabLayout(props);
+    },
+    screenListeners(props) {
+        return {
+            focus(e) {
+                console.log(e.target, e.data);
+            },
+        };
     },
 });
 

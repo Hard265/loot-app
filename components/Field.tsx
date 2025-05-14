@@ -1,11 +1,11 @@
+import { useTheme } from "@react-navigation/native";
 import { createContext, PropsWithChildren } from "react";
 import { View } from "react-native";
 import Text from "./Text";
-import { ExclamationCircleIcon } from "react-native-heroicons/mini";
-import { useTheme } from "@react-navigation/native";
 
 const FieldContext = createContext({
     disabled: false,
+    errors: [] as string[],
 });
 
 interface FieldProps extends PropsWithChildren {
@@ -13,21 +13,18 @@ interface FieldProps extends PropsWithChildren {
     errors?: string[];
 }
 
-const Field = ({ children, ...props }: FieldProps) => {
-    const { colors } = useTheme();
+const Field = ({ children, errors = [], ...props }: FieldProps) => {
     return (
-        <FieldContext.Provider value={{ disabled: !!props.disabled }}>
+        <FieldContext.Provider
+            value={{ disabled: !!props.disabled, errors: errors }}
+        >
             <View className="p-2">
                 {children}
-                {props.errors?.map((err, index) => (
+                {errors.map((err, index) => (
                     <View
                         key={index}
                         className="mt-1 flex-row items-center gap-1"
                     >
-                        {/* <ExclamationCircleIcon
-                            size={14}
-                            color={colors.notification}
-                        /> */}
                         <Text
                             color="error"
                             variant="footnote"

@@ -23,7 +23,7 @@ export function Button(props: PropsWithChildren<ButtonProps>) {
             <View
                 className={clsx(
                     "flex flex-row items-center justify-center gap-4 bg-primary p-2.5 px-4 shadow-sm shadow-text",
-                    { "opacity-75": !enabled },
+                    { "opacity-50": !enabled },
                 )}
             >
                 {!!props.loading && <ActivityIndicator />}

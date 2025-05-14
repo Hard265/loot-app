@@ -1,3 +1,4 @@
+import Alert from "@/components/Alert";
 import { Button, ButtonOutlined } from "@/components/Button";
 import { Field } from "@/components/Field";
 import { Input } from "@/components/Input";
@@ -20,19 +21,23 @@ export default function SignIn() {
         detail: "",
     });
 
+    // Reset error when input changes
+    const onChangeProxy =
+        (field: keyof typeof formState) => (value: string) => {
+            setFormState((prevState) => ({
+                ...prevState,
+                [field]: value,
+            }));
+            setErr({ detail: "" });
+        };
+
     const handleSignin = async () => {
         setPending(true);
         try {
             await signIn(formState);
         } catch (err: any) {
-            if (
-                err.response &&
-                err.response.status === 400 &&
-                err.response.data?.detail
-            ) {
-                setErr(err.response.data.detail);
-            } else {
-                console.log(err);
+            if ("response" in err && err.response.status === 401) {
+                setErr(err.response.data);
             }
         } finally {
             setPending(false);
@@ -54,17 +59,13 @@ export default function SignIn() {
                 >
                     Sign In
                 </Text>
+                {err.detail && <Alert variant="error">{err.detail}</Alert>}
             </View>
             <Field>
                 <Label>Email address</Label>
                 <Input
                     value={formState.email}
-                    onChange={(email) =>
-                        setFormState((prevState) => ({
-                            ...prevState,
-                            email,
-                        }))
-                    }
+                    onChange={onChangeProxy("email")}
                     type="email-address"
                 />
             </Field>
@@ -72,12 +73,7 @@ export default function SignIn() {
                 <Label>Password</Label>
                 <Input
                     value={formState.password}
-                    onChange={(password) =>
-                        setFormState((prevState) => ({
-                            ...prevState,
-                            password,
-                        }))
-                    }
+                    onChange={onChangeProxy("password")}
                     password
                 />
             </Field>

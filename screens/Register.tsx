@@ -9,7 +9,7 @@ import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
 export default function Register() {
-    const { signIn } = useAuth();
+    const { signUp } = useAuth();
     const [pending, setPending] = useState(false);
     const [formState, setFormState] = useState({
         email: "",
@@ -46,11 +46,10 @@ export default function Register() {
         }
         setPending(true);
         try {
-            await signIn(formState);
-        } catch (err) {
-            if (err instanceof Error && (err as any).status === 400) {
-                setErrs((err as any).response.data);
-            }
+            await signUp(formState);
+        } catch (err: any) {
+            if (err.response && err.response.status === 400)
+                setErrs(err.response.data);
         } finally {
             setPending(false);
         }

@@ -1,16 +1,17 @@
 import "./global.css";
 
+import { DarkTheme, DefaultTheme, Theme } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useMemo, useReducer } from "react";
+import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Navigation from "./Router";
 import { AuthContext } from "./contexts/AuthContext";
 import { SignInContext } from "./contexts/SignInContext";
-import { login, UserData } from "./services/userApi";
 import { deleteToken, setToken } from "./services/api";
-import { DarkTheme, DefaultTheme, Theme } from "@react-navigation/native";
-import { useColorScheme } from "react-native";
-import { useFonts } from "expo-font";
+import { login, register, UserData } from "./services/userApi";
+import store from "./stores";
 
 export default function App() {
     const colorScheme = useColorScheme();
@@ -69,10 +70,24 @@ export default function App() {
         () => ({
             async signIn(credintials: UserData) {
                 const { data } = await login(credintials);
+                console.log(data);
+
                 await setToken(data);
                 dispatch({
                     type: "SIGN_IN",
                     token: data,
+                });
+            },
+            async signUp(credintials: UserData) {
+                const { data } = await register(credintials);
+                await store.authStore.setUser({
+                    email: data.email,
+                    id: data.id,
+                });
+                await setToken(data.token);
+                dispatch({
+                    type: "SIGN_IN",
+                    token: data.token,
                 });
             },
             async signOut() {
