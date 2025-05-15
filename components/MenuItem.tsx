@@ -1,29 +1,30 @@
 import { Text } from "react-native";
-import { useMenu } from "./MenuContext";
 import { cssInterop } from "nativewind";
 import { RectButton } from "react-native-gesture-handler";
+import { PropsWithChildren, ReactNode } from "react";
+import { useMenu } from "./Menu";
 
 cssInterop(RectButton, { className: "style" });
 
 interface MenuItemProps {
-    title: string;
-    onPress: () => void;
+    value: any;
+    icon: ReactNode;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ title, onPress }) => {
-    const { closeMenu } = useMenu();
-
-    const handlePress = () => {
-        onPress();
-        closeMenu();
-    };
+const MenuItem: React.FC<PropsWithChildren<MenuItemProps>> = ({
+    children,
+    value,
+    icon,
+}) => {
+    const { onSelect } = useMenu();
 
     return (
         <RectButton
-            className="py-2 border-b border-gray-300 last:border-b-0"
-            onPress={handlePress}
+            className="flex flex-row items-center gap-4 border-b border-gray-300 p-2 last:border-b-0"
+            onPress={() => onSelect(value)}
         >
-            <Text className="text-lg text-gray-800">{title}</Text>
+            {icon}
+            <Text className="text-lg text-text">{children}</Text>
         </RectButton>
     );
 };

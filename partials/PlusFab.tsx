@@ -11,25 +11,23 @@ import Animated, {
 
 export default function PlusFab() {
     const { colors } = useTheme();
-    const { show, shown } = usePlusFab();
+    const { show } = usePlusFab();
 
     return (
-        shown && (
-            <Animated.View
-                entering={FadeInDown}
-                exiting={FadeOutDown}
-                layout={LinearTransition}
-                className="absolute bottom-8 right-5 bg-primary shadow"
-            >
-                <RectButton onPress={() => show()}>
-                    <View className="rounded bg-primary p-4 shadow">
-                        <PlusIcon
-                            color={colors.text}
-                            size={24}
-                        />
-                    </View>
-                </RectButton>
-            </Animated.View>
-        )
+        <Animated.View
+            entering={FadeInDown}
+            exiting={FadeOutDown}
+            layout={LinearTransition}
+            className="absolute bottom-8 right-5 bg-primary shadow"
+        >
+            <RectButton onPress={() => show()}>
+                <View className="rounded bg-primary p-4 shadow">
+                    <PlusIcon
+                        color={colors.text}
+                        size={24}
+                    />
+                </View>
+            </RectButton>
+        </Animated.View>
     );
 }

@@ -2,11 +2,18 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { BackHandler } from "react-native";
 
-export default function useBackHandler(callback?: () => boolean) {
+export default function useBackHandler(
+    condition: boolean,
+    callback?: () => void,
+) {
     useFocusEffect(
         useCallback(() => {
             const backHandler = () => {
-                return callback?.();
+                if (condition) {
+                    callback?.();
+                    return true;
+                }
+                return false;
             };
             const subscriber = BackHandler.addEventListener(
                 "hardwareBackPress",
@@ -16,6 +23,6 @@ export default function useBackHandler(callback?: () => boolean) {
             return () => {
                 subscriber.remove();
             };
-        }, [callback]),
+        }, [callback, condition]),
     );
 }

@@ -1,5 +1,6 @@
 import PlusFabContext from "@/contexts/PlusFabContext";
 import useBackHandler from "@/hooks/useBackHandler";
+import { useIsSignedIn } from "@/hooks/useIsSigned";
 import PlusFab from "@/partials/PlusFab";
 import PlusFabSheet from "@/partials/PlusFabSheet";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -8,10 +9,10 @@ import { PropsWithChildren, useMemo, useRef, useState } from "react";
 export default function PlusFabLayout(props: PropsWithChildren) {
     const [shown, setShown] = useState(false);
     const bottomSheetRef = useRef<BottomSheet>(null);
+    const isSignedIn = useIsSignedIn();
 
-    useBackHandler(() => {
+    useBackHandler(shown, () => {
         plusFabContext.dismiss();
-        return true;
     });
 
     const plusFabContext = useMemo(
@@ -31,12 +32,16 @@ export default function PlusFabLayout(props: PropsWithChildren) {
     return (
         <PlusFabContext.Provider value={{ ...plusFabContext, shown }}>
             {props.children}
-            <PlusFab />
-            <PlusFabSheet
-                ref={bottomSheetRef}
-                onShown={() => setShown(true)}
-                onDismiss={() => setShown(false)}
-            />
+            {isSignedIn && (
+                <>
+                    <PlusFab />
+                    <PlusFabSheet
+                        ref={bottomSheetRef}
+                        onShown={() => setShown(true)}
+                        onDismiss={() => setShown(false)}
+                    />
+                </>
+            )}
         </PlusFabContext.Provider>
     );
 }

@@ -16,6 +16,7 @@ export default function Register() {
         password: "",
         password2: "",
     });
+
     const [errs, setErrs] = useState({
         email: [] as string[],
         password: [] as string[],
@@ -94,7 +95,7 @@ export default function Register() {
                 </View>
                 <View className="flex flex-1">
                     <Field errors={errs.password2}>
-                        <Label>Confirm Password</Label>
+                        <Label>Confirm password</Label>
                         <Input
                             value={formState.password2}
                             onChange={(password2) =>

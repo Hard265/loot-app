@@ -6,6 +6,8 @@ import Home from "./screens/Home";
 import Register from "./screens/Register";
 import PasswordReset from "./screens/PasswordReset";
 import PlusFabLayout from "./layouts/PlusFabLayout";
+import SignedOutHeaderRight from "./partials/SignedOutHeaderRight";
+import UiFeedbackLayout from "./layouts/UiFeedbackLayout";
 
 type RootStackT = {
     SignIn: undefined;
@@ -24,6 +26,7 @@ const RootStack = createNativeStackNavigator({
             screenOptions: {
                 headerShadowVisible: false,
                 animation: "slide_from_right",
+                headerRight: (props) => SignedOutHeaderRight(props),
                 title: "",
             },
         },
@@ -35,7 +38,7 @@ const RootStack = createNativeStackNavigator({
         },
     },
     layout(props) {
-        return PlusFabLayout(props);
+        return UiFeedbackLayout({ children: PlusFabLayout(props) });
     },
     screenListeners(props) {
         return {

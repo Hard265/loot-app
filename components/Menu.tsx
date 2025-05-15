@@ -1,18 +1,28 @@
-import React, { PropsWithChildren } from "react";
+import { createContext, PropsWithChildren, useContext } from "react";
 import { View } from "react-native";
-import { MenuProvider } from "./MenuContext";
+import Text from "./Text";
+
+const MenuContext = createContext<{ onSelect(value: any): void }>({
+    onSelect: function (value: any): void {
+        throw new Error("Function not implemented.");
+    },
+});
 
 interface MenuProps {
-    onRequestDismiss():void;
+    onSelect(value: unknown): void;
+    title?: string;
 }
 
-const Menu: React.FC<PropsWithChildren<MenuProps>> = ({children, onRequestDismiss}) => {
-    return    <MenuProvider closeMenu={onRequestDismiss}><View className="shadow border">
-        {children}
-    </View>
-        </MenuProvider>
+export function useMenu() {
+    const context = useContext(MenuContext);
+    return context;
 }
 
-Menu.displayName = "Menu";
-
-export default Menu;
+export default function Menu(props: PropsWithChildren<MenuProps>) {
+    return (
+        <MenuContext.Provider value={{ onSelect: props.onSelect }}>
+            {props.title && <Text variant="title3">{props.title}</Text>}
+            <View className="flex flex-col pb-4">{props.children}</View>
+        </MenuContext.Provider>
+    );
+}

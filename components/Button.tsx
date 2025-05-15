@@ -26,7 +26,12 @@ export function Button(props: PropsWithChildren<ButtonProps>) {
                     { "opacity-50": !enabled },
                 )}
             >
-                {!!props.loading && <ActivityIndicator />}
+                {!!props.loading && (
+                    <ActivityIndicator
+                        color="#ffffff"
+                        size="small"
+                    />
+                )}
                 <Text
                     variant="label"
                     color="tertiary"
