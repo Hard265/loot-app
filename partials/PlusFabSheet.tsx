@@ -12,9 +12,9 @@ import { RectButton } from "react-native-gesture-handler";
 import {
     CameraIcon,
     CloudArrowUpIcon,
-    DocumentMagnifyingGlassIcon,
-    FolderPlusIcon,
+    FolderIcon,
     PhotoIcon,
+    ViewfinderCircleIcon,
 } from "react-native-heroicons/outline";
 
 cssInterop(BottomSheet, {
@@ -38,7 +38,7 @@ export default function PlusFabSheet(props: PlusFabSheetProps) {
     const opts: { icon: ReactNode; label: string; action(): void }[] = [
         {
             icon: (
-                <FolderPlusIcon
+                <FolderIcon
                     color={colors.text}
                     size={iconSize}
                 />
@@ -74,7 +74,7 @@ export default function PlusFabSheet(props: PlusFabSheetProps) {
         },
         {
             icon: (
-                <DocumentMagnifyingGlassIcon
+                <ViewfinderCircleIcon
                     color={colors.text}
                     size={iconSize}
                 />
