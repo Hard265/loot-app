@@ -14,6 +14,7 @@ import {
     useRef,
     useState,
 } from "react";
+import { View } from "react-native";
 
 cssInterop(BottomSheet, {
     backgroundClassName: "backgroundStyle",
@@ -82,7 +83,10 @@ export default function UiFeedbackLayout({ children }: PropsWithChildren) {
                 handleIndicatorClassName="bg-text"
                 onChange={handleSheetIndexChange}
             >
-                <BottomSheetView>{sheetContent}</BottomSheetView>
+                <BottomSheetView>
+                    {sheetContent}
+                    <View />
+                </BottomSheetView>
             </BottomSheet>
         </UiFeedbackContext.Provider>
     );
