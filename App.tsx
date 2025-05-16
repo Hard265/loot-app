@@ -81,14 +81,16 @@ export default function App() {
         () => ({
             async signIn(credintials: UserData) {
                 const { data } = await login(credintials);
-                console.log(data);
-
-                await setToken(data);
+                await store.authStore.setUser({
+                    email: data.email,
+                    id: data.id,
+                });
+                await setToken(data.token);
                 dispatch({
                     type: "SIGN_IN",
-                    token: data,
+                    token: data.token,
                 });
-            },
+             },
             async signUp(credintials: UserData) {
                 const { data } = await register(credintials);
                 await store.authStore.setUser({
