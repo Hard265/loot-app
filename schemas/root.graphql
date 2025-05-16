@@ -1,0 +1,16 @@
+query GetRoot {
+    files(where: { folder: { equals: null } }) {
+        id
+        name
+        createdAt
+        size
+        file
+        folder
+    }
+    folders(where: { parentFolder: { equals: null } }) {
+        id
+        createdAt
+        name
+        parentFolder
+    }
+}

@@ -14,6 +14,8 @@ import { login, register, UserData } from "./services/userApi";
 import store from "./stores";
 import { setBackgroundColorAsync } from "expo-system-ui";
 import colors from "tailwindcss/colors";
+import { ApolloProvider } from "@apollo/client";
+import graphql from "./services/graphql";
 
 export default function App() {
     const colorScheme = useColorScheme();
@@ -79,8 +81,8 @@ export default function App() {
 
     const authContext = useMemo(
         () => ({
-            async signIn(credintials: UserData) {
-                const { data } = await login(credintials);
+            async signIn(credentials: UserData) {
+                const { data } = await login(credentials);
                 await store.authStore.setUser({
                     email: data.email,
                     id: data.id,
@@ -90,7 +92,7 @@ export default function App() {
                     type: "SIGN_IN",
                     token: data.token,
                 });
-             },
+            },
             async signUp(credintials: UserData) {
                 const { data } = await register(credintials);
                 await store.authStore.setUser({
@@ -120,13 +122,15 @@ export default function App() {
     }
 
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
-            <AuthContext.Provider value={authContext}>
-                <SignInContext.Provider value={isSignedIn}>
-                    <Navigation theme={getTheme(colorScheme === "dark")} />
-                </SignInContext.Provider>
-            </AuthContext.Provider>
-        </GestureHandlerRootView>
+        <ApolloProvider client={graphql}>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <AuthContext.Provider value={authContext}>
+                    <SignInContext.Provider value={isSignedIn}>
+                        <Navigation theme={getTheme(colorScheme === "dark")} />
+                    </SignInContext.Provider>
+                </AuthContext.Provider>
+            </GestureHandlerRootView>
+        </ApolloProvider>
     );
 }
 

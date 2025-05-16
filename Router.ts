@@ -1,17 +1,18 @@
 import { createStaticNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import SignIn from "./screens/SignIn";
 import { useIsSignedIn, useIsSignedOut } from "./hooks/useIsSigned";
-import Home from "./screens/Home";
-import Register from "./screens/Register";
-import PasswordReset from "./screens/PasswordReset";
 import PlusFabLayout from "./layouts/PlusFabLayout";
 import SignedOutHeaderRight from "./partials/SignedOutHeaderRight";
-import UiFeedbackLayout from "./layouts/UiFeedbackLayout";
+import Folder from "./screens/Folder";
+import Home from "./screens/Home";
+import PasswordReset from "./screens/PasswordReset";
+import Register from "./screens/Register";
+import SignIn from "./screens/SignIn";
 
 type RootStackT = {
     SignIn: undefined;
     Home: undefined;
+    Folder: { id: string };
     Register: undefined;
     ResetPassword: {
         email?: string;
@@ -34,6 +35,7 @@ const RootStack = createNativeStackNavigator({
             if: useIsSignedIn,
             screens: {
                 Home,
+                Folder,
             },
         },
     },
