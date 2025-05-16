@@ -2,7 +2,11 @@ import { Link, useNavigation, useTheme } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable } from "react-native";
-import { ArrowDownIcon, FolderIcon } from "react-native-heroicons/outline";
+import {
+    ArrowDownIcon,
+    DocumentTextIcon,
+    FolderIcon,
+} from "react-native-heroicons/outline";
 import Animated, {
     FadeIn,
     FadeOut,
@@ -22,18 +26,18 @@ import { gql, useQuery } from "@apollo/client";
 
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
-const GET_FOLDERS_UNION_FILES = gql`
-    query GetRoot {
-        files {
+const GET_FOLDER_CONTENTS = gql`
+    query GetFolderContents($id: UUID) {
+        folders(parentFolderId: $id) {
             id
             name
             createdAt
-            size
-            file
         }
-        folders {
+        files(folderId: $id) {
             id
             name
+            size
+            file
             createdAt
         }
     }
@@ -62,7 +66,7 @@ export default function Home() {
     const { data, loading } = useQuery<{
         files: File[];
         folders: Folder[];
-    }>(GET_FOLDERS_UNION_FILES);
+    }>(GET_FOLDER_CONTENTS, { variables: { id: null } });
 
     useEffect(() => {
         (async () => {
@@ -81,28 +85,38 @@ export default function Home() {
         });
     }, [navigation, userImage]);
 
-    const renderItem = ({
-        item: { id, ...item },
-    }: {
-        item: { name: string; id: string };
-    }) => (
-        <ListItem
-            title={item.name}
-            onTap={() => {
-                navigation.push("Folder", { id });
-            }}
-            icon={
-                <FolderIcon
-                    size={24}
-                    color={theme.colors.text}
-                />
-            }
-        />
-    );
+    const renderItem = ({ item: { id, ...item } }: { item: Folder | File }) => {
+        return "size" in item ? (
+            <ListItem
+                title={item.name}
+                icon={
+                    <DocumentTextIcon
+                        size={24}
+                        color={theme.colors.text}
+                    />
+                }
+            />
+        ) : (
+            <ListItem
+                title={item.name}
+                onTap={() => {
+                    navigation.push("Folder", { id });
+                }}
+                icon={
+                    <FolderIcon
+                        size={24}
+                        color={theme.colors.text}
+                    />
+                }
+            />
+        );
+    };
+
+    const dataParsed = [...(data?.folders || []), ...(data?.files || [])];
 
     return (
         <Animated.FlatList
-            data={data?.folders || []}
+            data={dataParsed}
             keyExtractor={(_, index) => index.toString()}
             contentContainerClassName="pb-[2000]"
             renderItem={renderItem}

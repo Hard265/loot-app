@@ -3,7 +3,7 @@ import { setContext } from "@apollo/client/link/context";
 import { getToken } from "./api";
 
 const httpLink = createHttpLink({
-    uri: "http://127.0.0.1:8000" + "/graphql/",
+    uri: process.env.EXPO_PUBLIC_URL_API + "/graphql/",
     headers: {
         "Content-Type": "application/json",
     },
@@ -20,7 +20,7 @@ const authLink = setContext(async (_, { headers }) => {
 });
 
 const graphql = new ApolloClient({
-    link: httpLink,
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
 });
 

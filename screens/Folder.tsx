@@ -16,6 +16,7 @@ import {
     ArrowDownIcon,
     DocumentTextIcon,
 } from "react-native-heroicons/outline";
+import {FolderIcon} from "react-native-heroicons/solid";
 import Animated, {
     FadeIn,
     FadeOut,
@@ -27,12 +28,27 @@ const GET_FOLDER = gql`
         folderById(id: $id) {
             id
             name
+            createdAt
+            parentFolder {
+                id
+                name
+            }
+            user {
+                id
+                email
+            }
         }
-        filesInFolder(folderId: $id) {
+        folders(parentFolderId: $id) {
+            name
+            createdAt
             id
+        }
+        files(folderId: $id) {
             name
             size
             createdAt
+            id
+            file
         }
     }
 `;
@@ -68,14 +84,26 @@ export default function Folder() {
         });
     }, [data, navigation]);
 
+    const list = [data?.folders || [], data?.files || []].flat(1);
+
     return (
         <Animated.FlatList
-            data={data.filesInFolder}
+            data={list}
             renderItem={({ item }) => {
-                return (
+                return "size" in item ? (
                     <ListItem
                         icon={
                             <DocumentTextIcon
+                                size={20}
+                                color={theme.colors.text}
+                            />
+                        }
+                        title={item.name}
+                    />
+                ) : (
+                    <ListItem
+                        icon={
+                            <FolderIcon
                                 size={20}
                                 color={theme.colors.text}
                             />
