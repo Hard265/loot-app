@@ -37,6 +37,10 @@ const RootStack = createNativeStackNavigator({
                 Home,
                 Folder,
             },
+            screenOptions: {
+                headerShadowVisible: false,
+                animation: "slide_from_right",
+            },
         },
     },
     layout(props) {

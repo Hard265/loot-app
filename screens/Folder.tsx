@@ -3,20 +3,19 @@ import Text from "@/components/Text";
 import { RootStackT } from "@/Router";
 import { gql, useQuery } from "@apollo/client";
 import {
-    NavigationProp,
     RouteProp,
     useNavigation,
     useRoute,
     useTheme,
 } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ActivityIndicator, Pressable } from "react-native";
 import {
     ArrowDownIcon,
     DocumentTextIcon,
+    FolderIcon,
 } from "react-native-heroicons/outline";
-import {FolderIcon} from "react-native-heroicons/solid";
 import Animated, {
     FadeIn,
     FadeOut,
@@ -57,15 +56,13 @@ const SortMenu = () => {
     const { colors } = useTheme();
 
     return (
-        <>
-            <Pressable className="flex-row items-center gap-2 bg-background p-2">
-                <Text variant="title3">Name</Text>
-                <ArrowDownIcon
-                    size={16}
-                    color={colors.text}
-                />
-            </Pressable>
-        </>
+        <Pressable className="flex-row items-center gap-2 bg-background p-2">
+            <Text variant="title3">Name</Text>
+            <ArrowDownIcon
+                size={16}
+                color={colors.text}
+            />
+        </Pressable>
     );
 };
 
@@ -74,14 +71,28 @@ export default function Folder() {
     const route = useRoute<RouteProp<RootStackT, "Folder">>();
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackT, "Folder">>();
-    const { data, loading } = useQuery(GET_FOLDER, {
+
+    const { data, loading, refetch } = useQuery(GET_FOLDER, {
         variables: { id: route.params.id },
     });
 
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        try {
+            await refetch();
+        } finally {
+            setRefreshing(false);
+        }
+    }, [refetch]);
+
     useEffect(() => {
-        navigation.setOptions({
-            title: data.folderById.name,
-        });
+        if (data?.folderById?.name) {
+            navigation.setOptions({
+                title: data.folderById.name || "",
+            });
+        }
     }, [data, navigation]);
 
     const list = [data?.folders || [], data?.files || []].flat(1);
@@ -89,8 +100,8 @@ export default function Folder() {
     return (
         <Animated.FlatList
             data={list}
-            renderItem={({ item }) => {
-                return "size" in item ? (
+            renderItem={({ item }) =>
+                "size" in item ? (
                     <ListItem
                         icon={
                             <DocumentTextIcon
@@ -102,6 +113,11 @@ export default function Folder() {
                     />
                 ) : (
                     <ListItem
+                        onTap={() => {
+                            navigation.push("Folder", {
+                                id: item.id,
+                            });
+                        }}
                         icon={
                             <FolderIcon
                                 size={20}
@@ -110,8 +126,9 @@ export default function Folder() {
                         }
                         title={item.name}
                     />
-                );
-            }}
+                )
+            }
+            keyExtractor={({ id }) => id}
             stickyHeaderIndices={[0]}
             ListHeaderComponent={<SortMenu />}
             ListFooterComponent={
@@ -129,6 +146,8 @@ export default function Folder() {
                     </Animated.View>
                 ) : null
             }
+            refreshing={refreshing}
+            onRefresh={onRefresh}
         />
     );
 }
