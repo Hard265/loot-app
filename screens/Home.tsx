@@ -13,9 +13,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowDownIcon, FolderIcon } from "react-native-heroicons/outline";
 
 import ListItem from "@/components/ListItem";
-import Menu from "@/components/Menu";
+// import Menu from "@/components/Menu";
 import Text from "@/components/Text";
-import useUiFeedback from "@/hooks/useUiFeedback";
+// import useUiFeedback from "@/hooks/useUiFeedback";
 import { RootStackT } from "@/Router";
 
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
@@ -41,7 +41,7 @@ const Header = ({ animatedStyle }: { animatedStyle: any }) => {
 };
 
 const SortMenu = ({ onSort }: { onSort: (value: string) => void }) => {
-    const { menu } = useUiFeedback();
+    // const { menu } = useUiFeedback();
 
     const menuItems = useMemo(
         () => [
@@ -54,13 +54,14 @@ const SortMenu = ({ onSort }: { onSort: (value: string) => void }) => {
     );
 
     const handleSort = async () => {
-        await menu(({ dismiss, select }) => (
+        /*await menu(({ dismiss, select }) => (
             <Menu
                 onSelect={select}
                 title="Sort by"
                 items={menuItems}
             />
         )).then(onSort);
+        */
     };
 
     return (

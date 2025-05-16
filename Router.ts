@@ -38,7 +38,7 @@ const RootStack = createNativeStackNavigator({
         },
     },
     layout(props) {
-        return UiFeedbackLayout({ children: PlusFabLayout(props) });
+        return PlusFabLayout(props);
     },
     screenListeners(props) {
         return {
