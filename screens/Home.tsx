@@ -8,7 +8,7 @@ import Animated, {
     Extrapolation,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowDownIcon, FolderIcon } from "react-native-heroicons/outline";
 
@@ -76,6 +76,7 @@ const SortMenu = ({ onSort }: { onSort: (value: string) => void }) => {
 };
 
 export default function Home() {
+    const theme = useTheme();
     const navigation = useNavigation<NavigationProp>();
     const [headerHeight, setHeaderHeight] = React.useState(0);
     const scrollY = useSharedValue(0);
@@ -98,7 +99,12 @@ export default function Home() {
     const renderItem = ({ item }: { item: { name: string } }) => (
         <ListItem
             title={item.name}
-            icon={<FolderIcon size={24} />}
+            icon={
+                <FolderIcon
+                    size={24}
+                    color={theme.colors.text}
+                />
+            }
         />
     );
 
