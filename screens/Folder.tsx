@@ -1,7 +1,7 @@
 import ListItem from "@/components/ListItem";
 import Text from "@/components/Text";
 import { RootStackT } from "@/Router";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, TypedDocumentNode } from "@apollo/client";
 import {
     RouteProp,
     useNavigation,
@@ -10,7 +10,13 @@ import {
 } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, TextProps, View } from "react-native";
+import {
+    ActivityIndicator,
+    Pressable,
+    TextProps,
+    View,
+    RefreshControl,
+} from "react-native";
 import {
     ArrowDownIcon,
     DocumentTextIcon,
@@ -26,8 +32,19 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
 } from "react-native-reanimated";
+import type { Folder as FolderType, File as FileType } from "@/global";
 
-const GET_FOLDER = gql`
+interface FolderEntity {
+    folderById: FolderType;
+    folders: FolderType[];
+    files: FileType[];
+}
+
+interface FolderObjectVariables {
+    id: string;
+}
+
+const GET_FOLDER: TypedDocumentNode<FolderEntity, FolderObjectVariables> = gql`
     query GetFolderById($id: UUID!) {
         folderById(id: $id) {
             id
@@ -74,8 +91,10 @@ const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
 
 const ListHeader: FC<{ title: string }> = (props) => {
     return (
-        <View className="p-4">
-            <Text variant="largeTitle">{props.title}</Text>
+        <View>
+            <View className="flex items-center justify-center pb-2 pt-4">
+                <Text variant="largeTitle">{props.title}</Text>
+            </View>
             <SortMenu />
         </View>
     );
@@ -147,36 +166,45 @@ export default function Folder() {
 
     const list = [data?.folders || [], data?.files || []].flat(1);
 
+    const renderItem = ({ item }: { item: (typeof list)[number] }) =>
+        "size" in item ? (
+            <ListItem
+                icon={
+                    <DocumentTextIcon
+                        size={24}
+                        color={theme.colors.text}
+                    />
+                }
+                title={item.name}
+            />
+        ) : (
+            <ListItem
+                onTap={() => {
+                    navigation.push("Folder", {
+                        id: item.id,
+                    });
+                }}
+                icon={
+                    <FolderIcon
+                        size={24}
+                        color={theme.colors.text}
+                    />
+                }
+                title={item.name}
+            />
+        );
+
     return (
         <Animated.FlatList
             data={list}
-            renderItem={({ item }) =>
-                "size" in item ? (
-                    <ListItem
-                        icon={
-                            <DocumentTextIcon
-                                size={20}
-                                color={theme.colors.text}
-                            />
-                        }
-                        title={item.name}
-                    />
-                ) : (
-                    <ListItem
-                        onTap={() => {
-                            navigation.push("Folder", {
-                                id: item.id,
-                            });
-                        }}
-                        icon={
-                            <FolderIcon
-                                size={20}
-                                color={theme.colors.text}
-                            />
-                        }
-                        title={item.name}
-                    />
-                )
+            renderItem={renderItem}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    tintColor={theme.colors.primary}
+                    progressBackgroundColor={theme.colors.background}
+                    onRefresh={onRefresh}
+                />
             }
             onScroll={scrollHandler}
             keyExtractor={({ id }) => id}
@@ -199,8 +227,6 @@ export default function Folder() {
                     </Animated.View>
                 ) : null
             }
-            refreshing={refreshing}
-            onRefresh={onRefresh}
         />
     );
 }
