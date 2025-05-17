@@ -9,17 +9,22 @@ import {
     useTheme,
 } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useEffect, useState, useCallback } from "react";
-import { ActivityIndicator, Pressable } from "react-native";
+import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, TextProps, View } from "react-native";
 import {
     ArrowDownIcon,
     DocumentTextIcon,
     FolderIcon,
 } from "react-native-heroicons/outline";
 import Animated, {
+    Extrapolation,
     FadeIn,
     FadeOut,
+    interpolate,
     LinearTransition,
+    useAnimatedScrollHandler,
+    useAnimatedStyle,
+    useSharedValue,
 } from "react-native-reanimated";
 
 const GET_FOLDER = gql`
@@ -52,6 +57,30 @@ const GET_FOLDER = gql`
     }
 `;
 
+const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
+    props,
+) => {
+    return (
+        <View className="overflow-hidden">
+            <Animated.Text
+                className="translate-y-8 font-[MontrealMedium] text-2xl color-text"
+                style={props.style}
+            >
+                {props.children}
+            </Animated.Text>
+        </View>
+    );
+};
+
+const ListHeader: FC<{ title: string }> = (props) => {
+    return (
+        <View className="p-4">
+            <Text variant="largeTitle">{props.title}</Text>
+            <SortMenu />
+        </View>
+    );
+};
+
 const SortMenu = () => {
     const { colors } = useTheme();
 
@@ -72,6 +101,11 @@ export default function Folder() {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackT, "Folder">>();
 
+    const titleOffset = useSharedValue(32);
+    const titleOffsetStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: titleOffset.value }],
+    }));
+
     const { data, loading, refetch } = useQuery(GET_FOLDER, {
         variables: { id: route.params.id },
     });
@@ -88,12 +122,28 @@ export default function Folder() {
     }, [refetch]);
 
     useEffect(() => {
-        if (data?.folderById?.name) {
-            navigation.setOptions({
-                title: data.folderById.name || "",
-            });
-        }
-    }, [data, navigation]);
+        navigation.setOptions({
+            title: data?.folderById.name || "",
+            headerTitle({ children }) {
+                return (
+                    <HeaderTitle style={titleOffsetStyle}>
+                        {children}
+                    </HeaderTitle>
+                );
+            },
+        });
+    }, [data, navigation, titleOffsetStyle]);
+
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll(e) {
+            titleOffset.value = interpolate(
+                e.contentOffset.y,
+                [0, 58],
+                [32, 0],
+                Extrapolation.CLAMP,
+            );
+        },
+    });
 
     const list = [data?.folders || [], data?.files || []].flat(1);
 
@@ -128,9 +178,12 @@ export default function Folder() {
                     />
                 )
             }
+            onScroll={scrollHandler}
             keyExtractor={({ id }) => id}
             stickyHeaderIndices={[0]}
-            ListHeaderComponent={<SortMenu />}
+            ListHeaderComponent={
+                <ListHeader title={data?.folderById.name || ""} />
+            }
             ListFooterComponent={
                 loading ? (
                     <Animated.View

@@ -1,11 +1,12 @@
 {
   "expo": {
     "name": "loot",
-    "slug": "loot",
+    "slug": "loot-qdgzhjqktmlhleork7tpc",
     "version": "0.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
+    "primaryColor": "#6366f1",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -35,6 +36,8 @@
         "projectId": "a0910ccb-879a-4072-a018-b22449ffa68a"
       }
     },
-    "owner": "hard_265"
+    "owner": "hard_265",
+    "platforms": ["android","ios"],
+    "githubUrl": "https://github.com/hard_265/loot-app.git"
   }
 }

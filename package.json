@@ -48,5 +48,14 @@
     "prettier-plugin-tailwindcss": "^0.6.11",
     "typescript": "~5.8.3"
   },
-  "private": true
+  "private": true,
+  "author": {
+      "name": "hard_265",
+      "email": "hardynamakhwa@gmail.com"
+  },
+  "homepage": "https://github.com/hard_265/loot-app",
+  "maintainers": [{
+      "name": "hard_265",
+      "email": "hardynamakhwa@gmail.com"
+  }]
 }
