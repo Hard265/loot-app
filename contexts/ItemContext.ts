@@ -1,10 +1,8 @@
+import { File, Folder } from "@/global";
 import { createContext } from "react";
 
 const ItemContext = createContext<{
-    showItemContext<T extends object>(item: T): void;
-}>({
-    showItemContext: () => {
-        throw new Error("Function not implemented.");
-    },
-});
+    showItemContext<T extends File | Folder>(item: T): void;
+    data: File | Folder | null;
+}>(null);
 export default ItemContext;

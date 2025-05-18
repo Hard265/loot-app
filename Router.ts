@@ -9,6 +9,7 @@ import Register from "./screens/Register";
 import SignIn from "./screens/SignIn";
 import PlusFabLayout from "./layouts/PlusFabLayout";
 import User from "./screens/User";
+import ItemContextLayout from "./layouts/ItemContextLayout";
 
 type RootStackT = {
     SignIn: undefined;
@@ -40,15 +41,14 @@ const RootStack = createNativeStackNavigator({
                 Folder,
                 User,
             },
+            // screenLayout: (props) => ItemContextLayout(props),
             screenOptions: {
                 headerShadowVisible: false,
                 animation: "slide_from_right",
             },
         },
     },
-    layout(props) {
-        return PlusFabLayout(props);
-    },
+    layout: (props) => ItemContextLayout({ children: PlusFabLayout(props) }),
 });
 
 const Navigation = createStaticNavigation(RootStack);

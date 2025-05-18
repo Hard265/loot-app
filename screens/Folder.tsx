@@ -94,8 +94,8 @@ const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
 
 const ListHeader: FC<{ title: string }> = (props) => {
     return (
-        <View className="flex flex-col w-ful">
-            <View className="flex items-center justify-center pt-4 pb-2">
+        <View className="w-ful flex flex-col">
+            <View className="flex items-center justify-center pb-2 pt-4">
                 <Text variant="largeTitle">{props.title}</Text>
             </View>
             <SortMenu />
@@ -107,7 +107,7 @@ const SortMenu = () => {
     const { colors } = useTheme();
 
     return (
-        <Pressable className="flex-row items-center p-4 gap-2 bg-background">
+        <Pressable className="flex-row items-center gap-2 bg-background p-4">
             <Text variant="title3">Name</Text>
             <ArrowDownIcon
                 size={16}

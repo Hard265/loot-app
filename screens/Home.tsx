@@ -45,7 +45,7 @@ const SortMenu = () => {
 
     return (
         <>
-            <Pressable className="flex-row items-center p-4 gap-2 bg-background">
+            <Pressable className="flex-row items-center gap-2 bg-background p-4">
                 <Text variant="title3">Name</Text>
                 <ArrowDownIcon
                     size={16}
@@ -60,10 +60,11 @@ export default function Home() {
     const theme = useTheme();
     const navigation = useNavigation<NavigationProp>();
     const [userImage, setUserImage] = useState("");
-    const { data, loading } = useQuery<{
+    const { data, loading, refetch } = useQuery<{
         files: File[];
         folders: Folder[];
     }>(GET_FOLDER_CONTENTS, { variables: { id: null } });
+    const [refetching, setRefetching] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -90,6 +91,11 @@ export default function Home() {
         });
     }, [navigation, userImage]);
 
+    const handleRefetch = () => {
+        setRefetching(true);
+        refetch().finally(() => setRefetching(false));
+    };
+
     const dataParsed = [...(data?.folders || []), ...(data?.files || [])];
 
     return (
@@ -99,6 +105,8 @@ export default function Home() {
             contentContainerClassName="pb-[2000]"
             renderItem={({ item }) => <FolderListItem item={item} />}
             stickyHeaderIndices={[0]}
+            onRefresh={handleRefetch}
+            refreshing={refetching}
             ListFooterComponent={
                 loading ? (
                     <Animated.View

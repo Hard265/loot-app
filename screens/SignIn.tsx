@@ -31,6 +31,9 @@ export default function SignIn() {
         onCompleted(data) {
             setUser(data.tokenAuth);
         },
+        onError(error) {
+            console.log(error.cause);
+        },
     });
 
     const onChangeProxy =

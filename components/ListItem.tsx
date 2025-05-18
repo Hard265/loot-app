@@ -8,6 +8,7 @@ import Animated, {
     FadeOut,
     LinearTransition,
 } from "react-native-reanimated";
+import clsx from "clsx";
 
 cssInterop(RectButton, { className: "style" });
 
@@ -19,16 +20,21 @@ export default function ListItem(props: {
     onTap?(): void;
     onLongTap?(): void;
 }) {
+    const disabled = !(props.onTap || props.onLongTap);
     return (
         <Animated.View
             entering={FadeIn}
             exiting={FadeOut}
             layout={LinearTransition}
+            className={clsx({
+                "opacity-50": disabled,
+            })}
         >
             <RectButton
                 onPress={props.onTap}
                 onLongPress={props.onLongTap}
-                className="flex flex-row items-center p-4 py-3 gap-4"
+                enabled={!disabled}
+                className="flex flex-row items-center gap-4 p-4 py-3"
             >
                 {props.icon}
                 <View className="flex-1">

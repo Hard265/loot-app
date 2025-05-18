@@ -1,16 +1,34 @@
 import ItemContext from "@/contexts/ItemContext";
+import { File, Folder } from "@/global";
 import ItemSheet from "@/partials/ItemSheet";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { PropsWithChildren, useRef } from "react";
+import { PropsWithChildren, useCallback, useRef, useState } from "react";
+
+type entity = Folder | File;
 
 export default function ItemContextLayout({ children }: PropsWithChildren) {
     const bottomSheetRef = useRef<BottomSheet>(null);
+    const [data, setData] = useState<entity | null>(null);
 
-    const showItemContext = (item: object) => {};
+    const showItemContext: <T extends entity>(item: T) => void = useCallback(
+        (item: entity) => {
+            setData(item);
+            bottomSheetRef.current?.expand();
+        },
+        [],
+    );
+
+    const handleSheetClose = useCallback(() => {
+        setData(null);
+    }, []);
+
     return (
-        <ItemContext.Provider value={{ showItemContext }}>
+        <ItemContext.Provider value={{ showItemContext, data }}>
             {children}
-<ItemSheet(props)
+            <ItemSheet
+                ref={bottomSheetRef}
+                onClose={handleSheetClose}
+            />
         </ItemContext.Provider>
     );
 }
