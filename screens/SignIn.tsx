@@ -4,48 +4,31 @@ import { Field } from "@/components/Field";
 import { Input } from "@/components/Input";
 import { Label } from "@/components/Label";
 import Text from "@/components/Text";
-import useAuth from "@/hooks/useAuth";
+import { useMutation } from "@apollo/client";
 import { Link } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
+import TOKEN_AUTH from "../schemas/getToken.gql";
+
 export default function SignIn() {
-    const { signIn } = useAuth();
-    const [pending, setPending] = useState(false);
     const [formState, setFormState] = useState({
         email: "",
         password: "",
     });
 
-    const [err, setErr] = useState({
-        detail: "",
+    const [getToken, { loading, error, reset }] = useMutation(TOKEN_AUTH, {
+        variables: formState,
     });
 
-    // Reset error when input changes
     const onChangeProxy =
         (field: keyof typeof formState) => (value: string) => {
             setFormState((prevState) => ({
                 ...prevState,
                 [field]: value,
             }));
-            setErr({ detail: "" });
+            if (error) reset();
         };
-
-    const handleSignin = async () => {
-        setPending(true);
-        try {
-            await signIn(formState);
-        } catch (err: any) {
-            if ("response" in err && err.response.status === 401) {
-                setErr(err.response.data);
-            }
-        } finally {
-            setPending(false);
-        }
-    };
-
-    const allowSubmit =
-        [formState.email, formState.password].every(Boolean) && !pending;
 
     return (
         <ScrollView
@@ -59,9 +42,9 @@ export default function SignIn() {
                 >
                     Sign In
                 </Text>
-                {err.detail && <Alert variant="error">{err.detail}</Alert>}
+                {error && <Alert variant="error">{error.message}</Alert>}
             </View>
-            <Field>
+            <Field disabled={loading}>
                 <Label>Email address</Label>
                 <Input
                     value={formState.email}
@@ -69,7 +52,7 @@ export default function SignIn() {
                     type="email-address"
                 />
             </Field>
-            <Field>
+            <Field disabled={loading}>
                 <Label>Password</Label>
                 <Input
                     value={formState.password}
@@ -79,9 +62,9 @@ export default function SignIn() {
             </Field>
             <View className="my-2 flex flex-row p-2">
                 <Button
-                    loading={pending}
-                    disabled={!allowSubmit}
-                    onPress={handleSignin}
+                    loading={loading}
+                    disabled={loading}
+                    onPress={() => getToken()}
                 >
                     Sign In
                 </Button>
@@ -105,7 +88,6 @@ export default function SignIn() {
                         <Text color="primary">Sign up</Text>
                     </Link>
                 </Text>
-                {/* <Text>{toRgb(colors.gray[300], { format: "css" })}</Text> */}
                 <Text
                     variant="body"
                     color="secondary"

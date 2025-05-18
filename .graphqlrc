@@ -1,0 +1,4 @@
+{
+    "schema": "https://hard265.pythonanywhere.com/graphql/",
+    "documents": ["schemas/**/*.{graphql, gql}"],
+}
