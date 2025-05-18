@@ -28,14 +28,19 @@ export default function ListItem(props: {
             <RectButton
                 onPress={props.onTap}
                 onLongPress={props.onLongTap}
-                className="flex flex-row items-center gap-2 p-2 py-3"
+                className="flex flex-row items-center p-4 py-3 gap-4"
             >
                 {props.icon}
                 <View className="flex-1">
-                    <Text variant="label">{props.title}</Text>
-                    {props.subtitle && (
-                        <Text variant="caption1">{props.subtitle}</Text>
-                    )}
+                    <Text variant="title3">{props.title}</Text>
+                    <View className="flex flex-row items-center justify-between">
+                        {props.subtitle && (
+                            <Text variant="callout">{props.subtitle}</Text>
+                        )}
+                        {props.trailing && (
+                            <Text variant="callout">{props.trailing}</Text>
+                        )}
+                    </View>
                 </View>
             </RectButton>
         </Animated.View>

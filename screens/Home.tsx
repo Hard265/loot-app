@@ -1,19 +1,14 @@
-import { Link, useNavigation, useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable } from "react-native";
-import {
-    ArrowDownIcon,
-    DocumentTextIcon,
-    FolderIcon,
-} from "react-native-heroicons/outline";
+import { ArrowDownIcon } from "react-native-heroicons/outline";
 import Animated, {
     FadeIn,
     FadeOut,
     LinearTransition,
 } from "react-native-reanimated";
 
-import ListItem from "@/components/ListItem";
 // import Menu from "@/components/Menu";
 import Text from "@/components/Text";
 // import useUiFeedback from "@/hooks/useUiFeedback";
@@ -24,6 +19,7 @@ import store from "@/stores";
 import { getGravatarUri } from "@/utils";
 import { gql, useQuery } from "@apollo/client";
 import { RectButton } from "react-native-gesture-handler";
+import FolderListItem from "@/partials/FolderListItem";
 
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
@@ -49,7 +45,7 @@ const SortMenu = () => {
 
     return (
         <>
-            <Pressable className="flex-row items-center gap-2 bg-background p-2">
+            <Pressable className="flex-row items-center p-4 gap-2 bg-background">
                 <Text variant="title3">Name</Text>
                 <ArrowDownIcon
                     size={16}
@@ -82,40 +78,17 @@ export default function Home() {
             title: "",
             headerLeft() {
                 return (
-                    <RectButton>
+                    <RectButton
+                        onPress={() => {
+                            navigation.navigate("User");
+                        }}
+                    >
                         <Avatar uri={userImage} />
                     </RectButton>
                 );
             },
         });
     }, [navigation, userImage]);
-
-    const renderItem = ({ item: { id, ...item } }: { item: Folder | File }) => {
-        return "size" in item ? (
-            <ListItem
-                title={item.name}
-                icon={
-                    <DocumentTextIcon
-                        size={24}
-                        color={theme.colors.text}
-                    />
-                }
-            />
-        ) : (
-            <ListItem
-                title={item.name}
-                onTap={() => {
-                    navigation.push("Folder", { id });
-                }}
-                icon={
-                    <FolderIcon
-                        size={24}
-                        color={theme.colors.text}
-                    />
-                }
-            />
-        );
-    };
 
     const dataParsed = [...(data?.folders || []), ...(data?.files || [])];
 
@@ -124,7 +97,7 @@ export default function Home() {
             data={dataParsed}
             keyExtractor={(_, index) => index.toString()}
             contentContainerClassName="pb-[2000]"
-            renderItem={renderItem}
+            renderItem={({ item }) => <FolderListItem item={item} />}
             stickyHeaderIndices={[0]}
             ListFooterComponent={
                 loading ? (

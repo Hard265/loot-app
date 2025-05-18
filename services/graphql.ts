@@ -1,6 +1,6 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { getToken } from "./api";
+import * as SecureStore from "expo-secure-store";
 
 const httpLink = createHttpLink({
     uri: process.env.EXPO_PUBLIC_URL_API + "/graphql/",
@@ -10,11 +10,11 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext(async (_, { headers }) => {
-    const token = await getToken();
+    const token = await SecureStore.getItemAsync("token");
     return {
         headers: {
             ...headers,
-            Authorization: token ? `Bearer ${token.access}` : "",
+            Authorization: token ? `JWT ${token}` : "",
         },
     };
 });

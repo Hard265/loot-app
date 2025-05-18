@@ -4,14 +4,23 @@ import { Field } from "@/components/Field";
 import { Input } from "@/components/Input";
 import { Label } from "@/components/Label";
 import Text from "@/components/Text";
-import { useMutation } from "@apollo/client";
+import useAuth from "@/hooks/useAuth";
+import { gql, useMutation } from "@apollo/client";
 import { Link } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
-import TOKEN_AUTH from "../schemas/getToken.gql";
+const TOKEN_AUTH = gql`
+    mutation GetToken($email: String!, $password: String!) {
+        tokenAuth(email: $email, password: $password) {
+            token
+            payload
+        }
+    }
+`;
 
 export default function SignIn() {
+    const { setUser } = useAuth();
     const [formState, setFormState] = useState({
         email: "",
         password: "",
@@ -19,6 +28,9 @@ export default function SignIn() {
 
     const [getToken, { loading, error, reset }] = useMutation(TOKEN_AUTH, {
         variables: formState,
+        onCompleted(data) {
+            setUser(data.tokenAuth);
+        },
     });
 
     const onChangeProxy =

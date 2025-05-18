@@ -1,5 +1,4 @@
 import usePlusFab from "@/hooks/usePlusFab";
-import { useTheme } from "@react-navigation/native";
 import { View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { PlusIcon } from "react-native-heroicons/solid";
@@ -17,13 +16,13 @@ export default function PlusFab() {
             entering={FadeInDown}
             exiting={FadeOutDown}
             layout={LinearTransition}
-            className="absolute bottom-8 right-5"
+            className="absolute bottom-8 left-4"
         >
             <RectButton onPress={() => show()}>
-                <View className="rounded bg-primary p-5 shadow">
+                <View className="p-4 shadow-sm bg-primary shadow-text">
                     <PlusIcon
                         color={"#ffffff"}
-                        size={28}
+                        size={26}
                     />
                 </View>
             </RectButton>

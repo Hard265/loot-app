@@ -8,6 +8,7 @@ import PasswordReset from "./screens/PasswordReset";
 import Register from "./screens/Register";
 import SignIn from "./screens/SignIn";
 import PlusFabLayout from "./layouts/PlusFabLayout";
+import User from "./screens/User";
 
 type RootStackT = {
     SignIn: undefined;
@@ -37,6 +38,7 @@ const RootStack = createNativeStackNavigator({
             screens: {
                 Home,
                 Folder,
+                User,
             },
             screenOptions: {
                 headerShadowVisible: false,

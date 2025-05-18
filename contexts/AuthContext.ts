@@ -1,8 +1,15 @@
-import type { UserData } from "@/services/userApi";
 import { createContext } from "react";
 
+export type authData = {
+    payload: {
+        email: string;
+        exp: number;
+        origIat: number;
+    };
+    token: string;
+};
+
 export const AuthContext = createContext({
-    async signIn(credintials: UserData) {},
-    async signUp(credintials: UserData) {},
-    async signOut() {},
+    async setUser(authData: authData) {},
+    async deleteUser() {},
 });

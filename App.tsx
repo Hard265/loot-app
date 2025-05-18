@@ -7,10 +7,8 @@ import { useEffect, useMemo, useReducer } from "react";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Navigation from "./Router";
-import { AuthContext } from "./contexts/AuthContext";
+import { AuthContext, authData } from "./contexts/AuthContext";
 import { SignInContext } from "./contexts/SignInContext";
-import { deleteToken, setToken } from "./services/api";
-import { login, register, UserData } from "./services/userApi";
 import store from "./stores";
 import { setBackgroundColorAsync } from "expo-system-ui";
 import colors from "tailwindcss/colors";
@@ -81,32 +79,16 @@ export default function App() {
 
     const authContext = useMemo(
         () => ({
-            async signIn(credentials: UserData) {
-                const { data } = await login(credentials);
-                await store.authStore.setUser({
-                    email: data.email,
-                    id: data.id,
-                });
-                await setToken(data.token);
+            async setUser(authData: authData) {
+                await store.authStore.setUser(authData.payload);
+                await SecureStore.setItemAsync("token", authData.token);
                 dispatch({
                     type: "SIGN_IN",
-                    token: data.token,
+                    token: authData.token,
                 });
             },
-            async signUp(credintials: UserData) {
-                const { data } = await register(credintials);
-                await store.authStore.setUser({
-                    email: data.email,
-                    id: data.id,
-                });
-                await setToken(data.token);
-                dispatch({
-                    type: "SIGN_IN",
-                    token: data.token,
-                });
-            },
-            async signOut() {
-                await deleteToken();
+            async deleteUser() {
+                await SecureStore.deleteItemAsync("token");
                 dispatch({ type: "SIGN_OUT" });
             },
         }),

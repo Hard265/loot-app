@@ -1,10 +1,8 @@
+import type { authData } from "@/contexts/AuthContext";
 import * as SecureStore from "expo-secure-store";
 import { action, makeObservable, observable, runInAction } from "mobx";
 
-interface UserData {
-    id: string;
-    email: string;
-}
+type UserData = authData["payload"];
 
 export class AuthStore {
     user: UserData | null = null;

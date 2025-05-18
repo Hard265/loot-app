@@ -1,4 +1,3 @@
-import ListItem from "@/components/ListItem";
 import Text from "@/components/Text";
 import { RootStackT } from "@/Router";
 import { gql, useQuery, TypedDocumentNode } from "@apollo/client";
@@ -8,7 +7,10 @@ import {
     useRoute,
     useTheme,
 } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {
+    NativeStackHeaderRightProps,
+    NativeStackNavigationProp,
+} from "@react-navigation/native-stack";
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -19,8 +21,7 @@ import {
 } from "react-native";
 import {
     ArrowDownIcon,
-    DocumentTextIcon,
-    FolderIcon,
+    MagnifyingGlassIcon,
 } from "react-native-heroicons/outline";
 import Animated, {
     Extrapolation,
@@ -33,6 +34,8 @@ import Animated, {
     useSharedValue,
 } from "react-native-reanimated";
 import type { Folder as FolderType, File as FileType } from "@/global";
+import FolderListItem from "@/partials/FolderListItem";
+import { RectButton } from "react-native-gesture-handler";
 
 interface FolderEntity {
     folderById: FolderType;
@@ -91,8 +94,8 @@ const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
 
 const ListHeader: FC<{ title: string }> = (props) => {
     return (
-        <View className="w-ful flex flex-col">
-            <View className="flex items-center justify-center pb-2 pt-4">
+        <View className="flex flex-col w-ful">
+            <View className="flex items-center justify-center pt-4 pb-2">
                 <Text variant="largeTitle">{props.title}</Text>
             </View>
             <SortMenu />
@@ -104,7 +107,7 @@ const SortMenu = () => {
     const { colors } = useTheme();
 
     return (
-        <Pressable className="flex-row items-center gap-2 bg-background p-2">
+        <Pressable className="flex-row items-center p-4 gap-2 bg-background">
             <Text variant="title3">Name</Text>
             <ArrowDownIcon
                 size={16}
@@ -150,6 +153,7 @@ export default function Folder() {
                     </HeaderTitle>
                 );
             },
+            headerRight: (props) => <HeaderRight {...props} />,
         });
     }, [data, navigation, titleOffsetStyle]);
 
@@ -166,39 +170,10 @@ export default function Folder() {
 
     const list = [data?.folders || [], data?.files || []].flat(1);
 
-    const renderItem = ({ item }: { item: (typeof list)[number] }) =>
-        "size" in item ? (
-            <ListItem
-                icon={
-                    <DocumentTextIcon
-                        size={24}
-                        color={theme.colors.text}
-                    />
-                }
-                title={item.name}
-                subtitle={item.createdAt}
-            />
-        ) : (
-            <ListItem
-                onTap={() => {
-                    navigation.push("Folder", {
-                        id: item.id,
-                    });
-                }}
-                icon={
-                    <FolderIcon
-                        size={24}
-                        color={theme.colors.text}
-                    />
-                }
-                title={item.name}
-            />
-        );
-
     return (
         <Animated.FlatList
             data={list}
-            renderItem={renderItem}
+            renderItem={({ item }) => <FolderListItem item={item} />}
             refreshControl={
                 <RefreshControl
                     refreshing={refreshing}
@@ -229,5 +204,18 @@ export default function Folder() {
                 ) : null
             }
         />
+    );
+}
+
+function HeaderRight(props: NativeStackHeaderRightProps) {
+    return (
+        <View>
+            <RectButton>
+                <MagnifyingGlassIcon
+                    size={24}
+                    color={props.tintColor}
+                />
+            </RectButton>
+        </View>
     );
 }

@@ -7,10 +7,12 @@ import { RootStackT } from "@/Router";
 import { FC, useEffect } from "react";
 import { RectButton } from "react-native-gesture-handler";
 import { QuestionMarkCircleIcon } from "react-native-heroicons/outline";
+import useAuth from "@/hooks/useAuth";
 
 const LogoutButton: FC = () => {
+    const { signOut } = useAuth();
     return (
-        <RectButton>
+        <RectButton onPress={() => signOut()}>
             <Text
                 variant="label"
                 color="error"
@@ -43,14 +45,14 @@ export default function User() {
     return (
         <ScrollView>
             <View className="flex flex-row items-start p-2">
-                <View className="temes-center flex flex-row">
+                <View className="flex flex-row temes-center">
                     <Image className="size-24"></Image>
                     <View className="flex flex-col items-start">
                         <Text variant="title2">[mail address]</Text>
                     </View>
                 </View>
                 <View className="w-full">
-                    <ProgressIndicator />
+                    {/*                    <ProgressIndicator />*/}
                 </View>
             </View>
             <View>
