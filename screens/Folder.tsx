@@ -91,7 +91,7 @@ const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
 
 const ListHeader: FC<{ title: string }> = (props) => {
     return (
-        <View>
+        <View className="w-ful flex flex-col">
             <View className="flex items-center justify-center pb-2 pt-4">
                 <Text variant="largeTitle">{props.title}</Text>
             </View>
@@ -176,6 +176,7 @@ export default function Folder() {
                     />
                 }
                 title={item.name}
+                subtitle={item.createdAt}
             />
         ) : (
             <ListItem
@@ -208,7 +209,7 @@ export default function Folder() {
             }
             onScroll={scrollHandler}
             keyExtractor={({ id }) => id}
-            stickyHeaderIndices={[0]}
+            // stickyHeaderIndices={[0]}
             ListHeaderComponent={
                 <ListHeader title={data?.folderById.name || ""} />
             }
