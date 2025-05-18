@@ -23,6 +23,7 @@ import { RootStackT } from "@/Router";
 import store from "@/stores";
 import { getGravatarUri } from "@/utils";
 import { gql, useQuery } from "@apollo/client";
+import { RectButton } from "react-native-gesture-handler";
 
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
@@ -80,7 +81,11 @@ export default function Home() {
         navigation.setOptions({
             title: "",
             headerLeft() {
-                return <Avatar uri={userImage} />;
+                return (
+                    <RectButton>
+                        <Avatar uri={userImage} />
+                    </RectButton>
+                );
             },
         });
     }, [navigation, userImage]);

@@ -10,7 +10,6 @@ import Animated, {
 } from "react-native-reanimated";
 
 export default function PlusFab() {
-    const { colors } = useTheme();
     const { show } = usePlusFab();
 
     return (
@@ -18,13 +17,13 @@ export default function PlusFab() {
             entering={FadeInDown}
             exiting={FadeOutDown}
             layout={LinearTransition}
-            className="absolute bottom-8 right-5 bg-primary shadow"
+            className="absolute bottom-8 right-5"
         >
             <RectButton onPress={() => show()}>
-                <View className="rounded bg-primary p-4 shadow">
+                <View className="rounded bg-primary p-5 shadow">
                     <PlusIcon
-                        color={colors.text}
-                        size={24}
+                        color={"#ffffff"}
+                        size={28}
                     />
                 </View>
             </RectButton>

@@ -8,18 +8,17 @@ import Animated, {
     FadeOut,
     LinearTransition,
 } from "react-native-reanimated";
-import { useDebouncedCallback } from "use-debounce";
 
 cssInterop(RectButton, { className: "style" });
 
 export default function ListItem(props: {
     title: string;
+    subtitle?: string;
+    trailing?: string;
     icon?: ReactNode;
     onTap?(): void;
     onLongTap?(): void;
 }) {
-    const onTap = useDebouncedCallback(() => props.onTap?.(), 500);
-
     return (
         <Animated.View
             entering={FadeIn}
@@ -27,13 +26,16 @@ export default function ListItem(props: {
             layout={LinearTransition}
         >
             <RectButton
-                onPress={onTap}
+                onPress={props.onTap}
                 onLongPress={props.onLongTap}
                 className="flex flex-row items-center gap-2 p-2 py-3"
             >
                 {props.icon}
                 <View className="flex-1">
                     <Text variant="label">{props.title}</Text>
+                    {props.subtitle && (
+                        <Text variant="caption1">{props.subtitle}</Text>
+                    )}
                 </View>
             </RectButton>
         </Animated.View>
