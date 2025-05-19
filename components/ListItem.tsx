@@ -1,6 +1,6 @@
 import { cssInterop } from "nativewind";
-import { ReactNode } from "react";
-import { View } from "react-native";
+import { ReactNode, useState } from "react";
+import { View, TextInput } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Text from "./Text";
 import Animated, {
@@ -13,6 +13,8 @@ import clsx from "clsx";
 cssInterop(RectButton, { className: "style" });
 
 export default function ListItem(props: {
+    editing?: string;
+    onSubmit?(title: string): void;
     title: string;
     subtitle?: string;
     trailing?: string;
@@ -20,6 +22,7 @@ export default function ListItem(props: {
     onTap?(): void;
     onLongTap?(): void;
 }) {
+    const [title, setTitle] = useState(props.title);
     const disabled = !(props.onTap || props.onLongTap);
     return (
         <Animated.View
@@ -37,8 +40,20 @@ export default function ListItem(props: {
                 className="flex flex-row items-center gap-4 p-4 py-3"
             >
                 {props.icon}
-                <View className="flex-1">
-                    <Text variant="title3">{props.title}</Text>
+                <View className="flex flex-1 flex-col">
+                    <View>
+                        {!props.editing ? (
+                            <Text variant="title3">{props.title}</Text>
+                        ) : (
+                            <TextInput
+                                value={title}
+                                onChangeText={setTitle}
+                                onSubmitEditing={() => props.onSubmit?.(title)}
+                                multiline={false}
+                                className="p-1 font-[MontrealMedium] text-xl text-text focus:border-2 focus:border-primary"
+                            />
+                        )}
+                    </View>
                     <View className="flex flex-row items-center justify-between">
                         {props.subtitle && (
                             <Text variant="callout">{props.subtitle}</Text>

@@ -2,23 +2,24 @@ import ListItem from "@/components/ListItem";
 import Text from "@/components/Text";
 import useBackHandler from "@/hooks/useBackHandler";
 import { useItemContext } from "@/hooks/useItemContext";
+import { RootStackT } from "@/Router";
 import BottomSheet, {
     BottomSheetBackdrop,
     BottomSheetBackdropProps,
     BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import dayjs from "dayjs";
 import { cssInterop } from "nativewind";
 import { ForwardedRef, useCallback, useState } from "react";
 import { View } from "react-native";
 import {
-    ArrowDownOnSquareStackIcon,
     ArrowDownTrayIcon,
     ArrowsPointingOutIcon,
+    CloudArrowDownIcon,
     ExclamationCircleIcon,
     PencilIcon,
-    SignalSlashIcon,
     TrashIcon,
     UserGroupIcon,
     UserPlusIcon,
@@ -36,6 +37,7 @@ cssInterop(BottomSheet, {
 
 export default function ItemSheet(props: ItemSheetProps) {
     const theme = useTheme();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackT>>();
     const { data } = useItemContext();
     const [isShown, setIsShown] = useState(false);
 
@@ -57,6 +59,7 @@ export default function ItemSheet(props: ItemSheetProps) {
         );
     }, []);
 
+    const isFile = data && "size" in data;
     const timestamp = dayjs(data?.createdAt).format("MMM DD, YYYY");
     return (
         <BottomSheet
@@ -71,7 +74,7 @@ export default function ItemSheet(props: ItemSheetProps) {
             onClose={() => props.onClose?.()}
         >
             <BottomSheetView className="flex flex-col">
-                <View className="flex flex-col items-start border-b border-text/15 p-4 pt-0.5">
+                <View className="flex flex-col items-start p-4 pt-0.5">
                     <Text variant="largeTitle">{data?.name}</Text>
                     <Text>{timestamp}</Text>
                 </View>
@@ -115,7 +118,7 @@ export default function ItemSheet(props: ItemSheetProps) {
                 <ListItem
                     title="Make available offline"
                     icon={
-                        <SignalSlashIcon
+                        <CloudArrowDownIcon
                             size={20}
                             color={theme.colors.text}
                         />
@@ -131,13 +134,20 @@ export default function ItemSheet(props: ItemSheetProps) {
                     }
                 />
                 <ListItem
-                    title="Details"
+                    title={`${isFile ? "File" : "Folder"} details`}
                     icon={
                         <ExclamationCircleIcon
                             size={20}
                             color={theme.colors.text}
                         />
                     }
+                    onTap={() => {
+                        navigation.navigate("Info", {
+                            id: data!.id,
+                            type: isFile ? "file" : "folder",
+                            data: data,
+                        });
+                    }}
                 />
                 <ListItem
                     title="Permanetly delete"

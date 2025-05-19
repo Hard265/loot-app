@@ -11,10 +11,20 @@ import PlusFabLayout from "./layouts/PlusFabLayout";
 import User from "./screens/User";
 import ItemContextLayout from "./layouts/ItemContextLayout";
 
+enum entity {
+    file = "file",
+    folder = "folder",
+}
+
 type RootStackT = {
     SignIn: undefined;
     Home: undefined;
     Folder: { id: string };
+    Info: {
+        id: string;
+        data: any;
+        type: entity;
+    };
     User: undefined;
     Register: undefined;
     ResetPassword: {
