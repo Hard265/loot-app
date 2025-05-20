@@ -1,8 +1,17 @@
-import { File, Folder } from "@/global";
+import { GetFolderContentsQuery } from "@/__generated__/schema/graphql";
 import { createContext } from "react";
 
+type ContentItem = GetFolderContentsQuery["contents"] extends (infer T)[]
+    ? NonNullable<T>
+    : never;
+
 const ItemContext = createContext<{
-    showItemContext<T extends File | Folder>(item: T): void;
-    data: File | Folder | null;
-}>(null);
+    showItemContext(item: ContentItem): void;
+    data: ContentItem | null;
+}>({
+    showItemContext: () => {
+        throw new Error("Function not implemented.");
+    },
+    data: null,
+});
 export default ItemContext;

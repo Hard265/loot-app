@@ -18,34 +18,9 @@ import { getGravatarUri } from "@/utils";
 import { useQuery } from "@apollo/client";
 import { RectButton } from "react-native-gesture-handler";
 import FolderListItem from "@/partials/FolderListItem";
-
-import { gql } from "__generated__";
+import {GetRootContentsDocument} from "@/__generated__/schema/graphql";
 
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
-
-const GET_CONTENTS = gql(/* GraphQL */ `
-    query GetContents {
-        contents {
-            ... on FolderType {
-                id
-                name
-                hasShareLinks
-                hasShares
-                createdAt
-            }
-            ... on FileType {
-                id
-                name
-                hasShareLinks
-                file
-                createdAt
-                hasShares
-                mimeType
-                size
-            }
-        }
-    }
-`);
 
 const SortMenu = () => {
     const { colors } = useTheme();
@@ -67,7 +42,7 @@ export default function Home() {
     const theme = useTheme();
     const navigation = useNavigation<NavigationProp>();
     const [userImage, setUserImage] = useState("");
-    const { data, loading, refetch } = useQuery(GET_CONTENTS);
+    const { data, loading, refetch } = useQuery(GetRootContentsDocument);
     const [refetching, setRefetching] = useState(false);
 
     useEffect(() => {

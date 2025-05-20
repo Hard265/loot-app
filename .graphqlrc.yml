@@ -11,3 +11,4 @@ extensions:
           gqlTagName: gql
     ignoreNoDocuments: true
     verbose: true
+overwrite: true

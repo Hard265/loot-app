@@ -35,57 +35,7 @@ import Animated, {
 } from "react-native-reanimated";
 import FolderListItem from "@/partials/FolderListItem";
 import { RectButton } from "react-native-gesture-handler";
-import { gql } from "@/__generated__";
-
-const GET_FOLDER = gql(/* GraphQL */ `
-    query GetFolderContents($id: UUID!) {
-        contents(folderId: $id) {
-            ... on FolderType {
-                id
-                name
-                hasShareLinks
-                hasShares
-                createdAt
-            }
-            ... on FileType {
-                id
-                name
-                hasShareLinks
-                file
-                createdAt
-                hasShares
-                mimeType
-                size
-            }
-        }
-        folderById(id: $id) {
-            id
-            name
-            parentFolder {
-                createdAt
-                id
-                name
-                user {
-                    email
-                    id
-                }
-            }
-            hasShareLinks
-            hasShares
-            createdAt
-        }
-    }
-`);
-
-const UPDATE_FILE = gql(/* GraphQL */ `
-    mutation UpdateFile($id: UUID!, $name: String!) {
-        updateFile(id: $id, name: $name) {
-            file {
-                name
-            }
-        }
-    }
-`);
+import { GetFolderContentsDocument } from "@/__generated__/schema/graphql";
 
 const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
     props,
@@ -138,8 +88,10 @@ export default function Folder() {
         transform: [{ translateY: titleOffset.value }],
     }));
 
-    const { data, loading, refetch } = useQuery(GET_FOLDER, {
-        variables: { id: route.params.id },
+    const { data, loading, refetch } = useQuery(GetFolderContentsDocument, {
+        variables: {
+            id: route.params.id,
+        },
     });
 
     const [refreshing, setRefreshing] = useState(false);
@@ -155,7 +107,7 @@ export default function Folder() {
 
     useEffect(() => {
         navigation.setOptions({
-            title: data?.folderById.name || "",
+            title: data?.folderById?.name || "",
             headerTitle({ children }) {
                 return (
                     <HeaderTitle style={titleOffsetStyle}>
@@ -178,7 +130,9 @@ export default function Folder() {
         },
     });
 
-    const list = [data?.folders || [], data?.files || []].flat(1);
+    const list = (data?.contents ?? []).filter(
+        (item): item is NonNullable<typeof item> => item !== null,
+    );
 
     return (
         <Animated.FlatList
