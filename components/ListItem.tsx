@@ -17,6 +17,7 @@ export default function ListItem(props: {
     onSubmit?(title: string): void;
     title: string;
     subtitle?: string;
+    subtitleLeading?: ReactNode;
     trailing?: string;
     icon?: ReactNode;
     onTap?(): void;
@@ -54,14 +55,19 @@ export default function ListItem(props: {
                             />
                         )}
                     </View>
-                    <View className="flex flex-row items-center justify-between">
-                        {props.subtitle && (
-                            <Text variant="callout">{props.subtitle}</Text>
-                        )}
-                        {props.trailing && (
-                            <Text variant="callout">{props.trailing}</Text>
-                        )}
-                    </View>
+                    {(props.subtitle || props.trailing || props.subtitleLeading) && (
+                        <View className="flex flex-row items-center justify-between">
+                            <View className="flex flex-row items-center gap-2">
+                                {props.subtitleLeading}
+                                {props.subtitle && (
+                                    <Text variant="callout">{props.subtitle}</Text>
+                                )}
+                            </View>
+                            {props.trailing && (
+                                <Text variant="callout">{props.trailing}</Text>
+                            )}
+                        </View>
+                    )}
                 </View>
             </RectButton>
         </Animated.View>

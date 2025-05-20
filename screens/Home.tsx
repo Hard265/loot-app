@@ -9,9 +9,7 @@ import Animated, {
     LinearTransition,
 } from "react-native-reanimated";
 
-// import Menu from "@/components/Menu";
 import Text from "@/components/Text";
-// import useUiFeedback from "@/hooks/useUiFeedback";
 import Avatar from "@/components/Avatar";
 import { File, Folder } from "@/global";
 import { RootStackT } from "@/Router";
