@@ -1,18 +1,20 @@
-import { ScrollView, View, Image } from "react-native";
-import Text from "../components/Text";
-import { ProgressIndicator } from "@/components/ProgressIndicator";
+import useAuth from "@/hooks/useAuth";
+import { RootStackT } from "@/Router";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackT } from "@/Router";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
+import { Image, ScrollView, View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { QuestionMarkCircleIcon } from "react-native-heroicons/outline";
-import useAuth from "@/hooks/useAuth";
+import Text from "../components/Text";
+import store from "@/stores";
+import { getGravatarUri } from "@/utils";
+import Avatar from "@/components/Avatar";
 
 const LogoutButton: FC = () => {
-    const { signOut } = useAuth();
+    const { deleteUser } = useAuth();
     return (
-        <RectButton onPress={() => signOut()}>
+        <RectButton onPress={() => deleteUser()}>
             <Text
                 variant="label"
                 color="error"
@@ -26,6 +28,7 @@ const LogoutButton: FC = () => {
 export default function User() {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackT, "User">>();
+    const [userImage, setUserImage] = useState("");
 
     useEffect(() => {
         navigation.setOptions({
@@ -41,14 +44,23 @@ export default function User() {
             },
         });
     }, [navigation]);
+    useEffect(() => {
+        (async () => {
+            setUserImage(
+                await getGravatarUri(store.authStore.user?.email!, 200),
+            );
+        })();
+    }, []);
 
     return (
         <ScrollView>
             <View className="flex flex-row items-start p-2">
-                <View className="flex flex-row temes-center">
-                    <Image className="size-24"></Image>
+                <View className="temes-center flex flex-row">
+                    <Avatar uri={userImage} />
                     <View className="flex flex-col items-start">
-                        <Text variant="title2">[mail address]</Text>
+                        <Text variant="title3">
+                            {store.authStore.user?.email}
+                        </Text>
                     </View>
                 </View>
                 <View className="w-full">

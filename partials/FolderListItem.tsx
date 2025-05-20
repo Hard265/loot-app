@@ -1,6 +1,5 @@
-import {GetFolderContentsQuery} from "@/__generated__/schema/graphql";
+import { GetFolderContentsQuery } from "@/__generated__/schema/graphql";
 import ListItem from "@/components/ListItem";
-import { File, Folder } from "@/global";
 import { useItemContext } from "@/hooks/useItemContext";
 import { RootStackT } from "@/Router";
 import { formatBytes } from "@/utils";
@@ -32,6 +31,7 @@ export default function FolderListItem({ item }: FolderListItemProps) {
             title={item.name}
             subtitle={datestamp}
             trailing={formatBytes(item.size, 1)}
+            onLongTap={() => showItemContext(item!)}
         />
     ) : (
         <ListItem

@@ -1,14 +1,18 @@
 schema:
-  - https://hard265.pythonanywhere.com/graphql/
+    - https://hard265.pythonanywhere.com/graphql/
 documents:
-  - schemas/**/*.graphql
+    - schemas/**/*.graphql
 extensions:
-  codegen:
-    generates:
-      ./__generated__/schema/:
-        preset: client
+    codegen:
+        generates:
+            ./__generated__/schema/:
+                preset: client
+        plugins:
+            - typescript
+            - typescript-operations
+            - typescript-react-apollo
         presetConfig:
-          gqlTagName: gql
-    ignoreNoDocuments: true
-    verbose: true
+            gqlTagName: gql
+        ignoreNoDocuments: true
+        verbose: true
 overwrite: true

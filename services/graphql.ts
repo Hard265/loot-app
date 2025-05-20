@@ -3,7 +3,7 @@ import { setContext } from "@apollo/client/link/context";
 import * as SecureStore from "expo-secure-store";
 
 const httpLink = createHttpLink({
-    uri: process.env.EXPO_PUBLIC_URL_API + "/graphql/",
+    uri: "https://hard265.pythonanywhere.com" + "/graphql/",
     headers: {
         "Content-Type": "application/json",
     },

@@ -5,19 +5,12 @@ import { Input } from "@/components/Input";
 import { Label } from "@/components/Label";
 import Text from "@/components/Text";
 import useAuth from "@/hooks/useAuth";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Link } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
-const TOKEN_AUTH = gql`
-    mutation GetToken($email: String!, $password: String!) {
-        tokenAuth(email: $email, password: $password) {
-            token
-            payload
-        }
-    }
-`;
+import { GetTokenDocument } from "@/__generated__/schema/graphql";
 
 export default function SignIn() {
     const { setUser } = useAuth();
@@ -26,15 +19,18 @@ export default function SignIn() {
         password: "",
     });
 
-    const [getToken, { loading, error, reset }] = useMutation(TOKEN_AUTH, {
-        variables: formState,
-        onCompleted(data) {
-            setUser(data.tokenAuth);
+    const [getToken, { loading, error, reset }] = useMutation(
+        GetTokenDocument,
+        {
+            variables: formState,
+            onCompleted(data) {
+                if ("tokenAuth" in data) setUser(data.tokenAuth!);
+            },
+            onError(error) {
+                console.log(error.networkError?.message);
+            },
         },
-        onError(error) {
-            console.log(error.cause);
-        },
-    });
+    );
 
     const onChangeProxy =
         (field: keyof typeof formState) => (value: string) => {
