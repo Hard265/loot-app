@@ -1,5 +1,5 @@
-mutation DeleteFile($id: UUID!) {
-  deleteFile(id: $id) {
-    success
-  }
+mutation ShredFile($id: UUID!) {
+    deleteFile(id: $id) {
+        success
+    }
 }

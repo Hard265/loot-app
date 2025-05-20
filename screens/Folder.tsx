@@ -150,7 +150,7 @@ export default function Folder() {
             keyExtractor={({ id }) => id}
             // stickyHeaderIndices={[0]}
             ListHeaderComponent={
-                <ListHeader title={data?.folderById.name || ""} />
+                <ListHeader title={data?.folderById?.name || ""} />
             }
             ListFooterComponent={
                 loading ? (

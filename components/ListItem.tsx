@@ -40,7 +40,9 @@ export default function ListItem(props: {
                 enabled={!disabled}
                 className="flex flex-row items-center gap-4 p-4 py-3"
             >
-                {props.icon}
+                <View className="h-6 w-6 items-center justify-center">
+                    {props.icon}
+                </View>
                 <View className="flex flex-1 flex-col">
                     <View>
                         {!props.editing ? (
@@ -55,12 +57,16 @@ export default function ListItem(props: {
                             />
                         )}
                     </View>
-                    {(props.subtitle || props.trailing || props.subtitleLeading) && (
+                    {(props.subtitle ||
+                        props.trailing ||
+                        props.subtitleLeading) && (
                         <View className="flex flex-row items-center justify-between">
                             <View className="flex flex-row items-center gap-2">
                                 {props.subtitleLeading}
                                 {props.subtitle && (
-                                    <Text variant="callout">{props.subtitle}</Text>
+                                    <Text variant="callout">
+                                        {props.subtitle}
+                                    </Text>
                                 )}
                             </View>
                             {props.trailing && (

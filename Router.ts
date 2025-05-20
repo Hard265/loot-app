@@ -10,6 +10,7 @@ import SignIn from "./screens/SignIn";
 import PlusFabLayout from "./layouts/PlusFabLayout";
 import User from "./screens/User";
 import ItemContextLayout from "./layouts/ItemContextLayout";
+import ShareScreen from "./screens/Share";
 
 enum entity {
     file = "file",
@@ -50,6 +51,7 @@ const RootStack = createNativeStackNavigator({
                 Home,
                 Folder,
                 User,
+                ShareScreen,
             },
             // screenLayout: (props) => ItemContextLayout(props),
             screenOptions: {

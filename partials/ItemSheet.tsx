@@ -59,7 +59,7 @@ export default function ItemSheet(props: ItemSheetProps) {
         );
     }, []);
 
-    const isFile = data && "size" in data;
+    const isFile = data?.__typename === "FileType";
     const timestamp = dayjs(data?.createdAt).format("MMM DD, YYYY");
     return (
         <BottomSheet
@@ -142,11 +142,11 @@ export default function ItemSheet(props: ItemSheetProps) {
                         />
                     }
                     onTap={() => {
-                        navigation.navigate("Info", {
-                            id: data!.id,
-                            type: isFile ? "file" : "folder",
-                            data: data,
-                        });
+                        // navigation.navigate("Info", {
+                        //     id: data!.id,
+                        //     type: isFile ? "file" : "folder",
+                        //     data: data,
+                        // });
                     }}
                 />
                 <ListItem
