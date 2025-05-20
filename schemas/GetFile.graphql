@@ -1,0 +1,37 @@
+query GetFile($id: UUID!) {
+  fileById(id: $id) {
+    createdAt
+    file
+    name
+    mimeType
+    id
+    size
+    hasShares
+    hasShareLinks
+    shareLinks {
+      createdAt
+      downloadCount
+      expiresAt
+      id
+      isActive
+      password
+      permission
+    }
+    shares {
+      id
+      expiresAt
+      isActive
+      permission
+      sharedAt
+      token
+      sharedBy {
+        email
+        id
+      }
+      sharedWith {
+        email
+        id
+      }
+    }
+  }
+}

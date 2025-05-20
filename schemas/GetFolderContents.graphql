@@ -1,0 +1,37 @@
+query GetFolderContents($id: UUID!) {
+  contents(folderId: $id) {
+    ... on FolderType {
+      id
+      name
+      hasShareLinks
+      hasShares
+      createdAt
+    }
+    ... on FileType {
+      id
+      name
+      hasShareLinks
+      file
+      createdAt
+      hasShares
+      mimeType
+      size
+    }
+  }
+  folderById(id: $id) {
+    id
+    name
+    parentFolder {
+      createdAt
+      id
+      name
+      user {
+        email
+        id
+      }
+    }
+    hasShareLinks
+    hasShares
+    createdAt
+  }
+}

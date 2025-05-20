@@ -1,0 +1,13 @@
+schema:
+  - https://hard265.pythonanywhere.com/graphql/
+documents:
+  - schemas/**/*.graphql
+extensions:
+  codegen:
+    generates:
+      ./__generated__/schema/:
+        preset: client
+        presetConfig:
+          gqlTagName: gql
+    ignoreNoDocuments: true
+    verbose: true

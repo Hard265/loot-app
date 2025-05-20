@@ -1,0 +1,8 @@
+mutation UpdateFolder($id: UUID!, $name: String!) {
+  updateFolder(id: $id, name: $name) {
+    folder {
+      name
+      id
+    }
+  }
+}

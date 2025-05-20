@@ -1,0 +1,8 @@
+mutation UpdateFile($id: UUID!, $name: String!) {
+  updateFile(id: $id, name: $name) {
+    file {
+      name
+      id
+    }
+  }
+}

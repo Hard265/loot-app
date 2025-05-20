@@ -1,0 +1,31 @@
+query GetShares {
+  shares {
+    expiresAt
+    id
+    isActive
+    permission
+    sharedAt
+    token
+    sharedBy {
+      email
+      id
+    }
+    sharedWith {
+      email
+      id
+    }
+    file {
+      createdAt
+      file
+      mimeType
+      id
+      name
+      size
+    }
+    folder {
+      createdAt
+      id
+      name
+    }
+  }
+}

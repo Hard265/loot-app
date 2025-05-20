@@ -1,0 +1,24 @@
+query GetShareLinks {
+  shareLinks {
+    createdAt
+    downloadCount
+    expiresAt
+    isActive
+    id
+    password
+    permission
+    file {
+      createdAt
+      file
+      mimeType
+      id
+      name
+      size
+    }
+    folder {
+      createdAt
+      name
+      id
+    }
+  }
+}

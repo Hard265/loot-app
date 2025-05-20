@@ -1,0 +1,11 @@
+mutation CreateFolder($parentFolderId: UUID, $name: String!) {
+  createFolder(name: $name, parentFolderId: $parentFolderId) {
+    folder {
+      createdAt
+      hasShareLinks
+      hasShares
+      name
+      id
+    }
+  }
+}

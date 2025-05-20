@@ -1,0 +1,14 @@
+mutation CreateFile($folderId: UUID!, $name: String, $file: Upload!) {
+  createFile(folderId: $folderId, file: $file, name: $name) {
+    file {
+      createdAt
+      file
+      id
+      mimeType
+      name
+      size
+      hasShares
+      hasShareLinks
+    }
+  }
+}

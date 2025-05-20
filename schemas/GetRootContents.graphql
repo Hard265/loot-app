@@ -1,0 +1,21 @@
+query GetRootContents {
+  contents {
+    ... on FileType {
+      id
+      name
+      hasShareLinks
+      file
+      createdAt
+      hasShares
+      mimeType
+      size
+    }
+    ... on FolderType {
+      id
+      name
+      hasShareLinks
+      hasShares
+      createdAt
+    }
+  }
+}

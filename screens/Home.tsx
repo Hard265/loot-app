@@ -15,28 +15,37 @@ import { File, Folder } from "@/global";
 import { RootStackT } from "@/Router";
 import store from "@/stores";
 import { getGravatarUri } from "@/utils";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { RectButton } from "react-native-gesture-handler";
 import FolderListItem from "@/partials/FolderListItem";
 
+import { gql } from "__generated__";
+
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
-const GET_FOLDER_CONTENTS = gql`
-    query GetFolderContents($id: UUID) {
-        folders(parentFolderId: $id) {
-            id
-            name
-            createdAt
-        }
-        files(folderId: $id) {
-            id
-            name
-            size
-            file
-            createdAt
+const GET_CONTENTS = gql(/* GraphQL */ `
+    query GetContents {
+        contents {
+            ... on FolderType {
+                id
+                name
+                hasShareLinks
+                hasShares
+                createdAt
+            }
+            ... on FileType {
+                id
+                name
+                hasShareLinks
+                file
+                createdAt
+                hasShares
+                mimeType
+                size
+            }
         }
     }
-`;
+`);
 
 const SortMenu = () => {
     const { colors } = useTheme();
@@ -58,10 +67,7 @@ export default function Home() {
     const theme = useTheme();
     const navigation = useNavigation<NavigationProp>();
     const [userImage, setUserImage] = useState("");
-    const { data, loading, refetch } = useQuery<{
-        files: File[];
-        folders: Folder[];
-    }>(GET_FOLDER_CONTENTS, { variables: { id: null } });
+    const { data, loading, refetch } = useQuery(GET_CONTENTS);
     const [refetching, setRefetching] = useState(false);
 
     useEffect(() => {
@@ -94,7 +100,7 @@ export default function Home() {
         refetch().finally(() => setRefetching(false));
     };
 
-    const dataParsed = [...(data?.folders || []), ...(data?.files || [])];
+    const dataParsed = data?.contents || [];
 
     return (
         <Animated.FlatList

@@ -1,6 +1,6 @@
 import Text from "@/components/Text";
 import { RootStackT } from "@/Router";
-import { gql, useQuery, TypedDocumentNode } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import {
     RouteProp,
     useNavigation,
@@ -33,49 +33,59 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
 } from "react-native-reanimated";
-import type { Folder as FolderType, File as FileType } from "@/global";
 import FolderListItem from "@/partials/FolderListItem";
 import { RectButton } from "react-native-gesture-handler";
+import { gql } from "@/__generated__";
 
-interface FolderEntity {
-    folderById: FolderType;
-    folders: FolderType[];
-    files: FileType[];
-}
-
-interface FolderObjectVariables {
-    id: string;
-}
-
-const GET_FOLDER: TypedDocumentNode<FolderEntity, FolderObjectVariables> = gql`
-    query GetFolderById($id: UUID!) {
+const GET_FOLDER = gql(/* GraphQL */ `
+    query GetFolderContents($id: UUID!) {
+        contents(folderId: $id) {
+            ... on FolderType {
+                id
+                name
+                hasShareLinks
+                hasShares
+                createdAt
+            }
+            ... on FileType {
+                id
+                name
+                hasShareLinks
+                file
+                createdAt
+                hasShares
+                mimeType
+                size
+            }
+        }
         folderById(id: $id) {
             id
             name
-            createdAt
             parentFolder {
+                createdAt
                 id
                 name
+                user {
+                    email
+                    id
+                }
             }
-            user {
-                id
-                email
-            }
-        }
-        folders(parentFolderId: $id) {
-            name
+            hasShareLinks
+            hasShares
             createdAt
-            id
-        }
-        files(folderId: $id) {
-            name
-            size
-            createdAt
-            id
-            file
         }
     }
-`;
+`);
+
+const UPDATE_FILE = gql(/* GraphQL */ `
+    mutation UpdateFile($id: UUID!, $name: String!) {
+        updateFile(id: $id, name: $name) {
+            file {
+                name
+            }
+        }
+    }
+`);
 
 const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
     props,

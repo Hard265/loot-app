@@ -1,5 +1,0 @@
-mutation GetToken($email: String!, $password: String!) {
-  tokenAuth(email: $email, password: $password) {
-    token
-    payload
-}
