@@ -1,3 +1,4 @@
+import {GetFolderContentsQuery} from "@/__generated__/schema/graphql";
 import ListItem from "@/components/ListItem";
 import { File, Folder } from "@/global";
 import { useItemContext } from "@/hooks/useItemContext";
@@ -9,14 +10,18 @@ import dayjs from "dayjs";
 import React from "react";
 import { DocumentIcon, FolderIcon } from "react-native-heroicons/outline";
 
-export default function FolderListItem({ item }: { item: Folder | File }) {
+interface FolderListItemProps {
+    item: NonNullable<GetFolderContentsQuery["contents"]>[number];
+}
+
+export default function FolderListItem({ item }: FolderListItemProps) {
     const { showItemContext } = useItemContext();
     const theme = useTheme();
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackT, "Folder">>();
+    const datestamp = dayjs(item?.createdAt).format("MMM DD, YYYY");
 
-    const datestamp = dayjs(item.createdAt).format("MMM DD, YYYY");
-    return "size" in item ? (
+    return item?.__typename === "FileType" ? (
         <ListItem
             icon={
                 <DocumentIcon
@@ -32,17 +37,17 @@ export default function FolderListItem({ item }: { item: Folder | File }) {
         <ListItem
             onTap={() => {
                 navigation.push("Folder", {
-                    id: item.id,
+                    id: item!.id,
                 });
             }}
-            onLongTap={() => showItemContext(item)}
+            onLongTap={() => showItemContext(item!)}
             icon={
                 <FolderIcon
                     size={28}
                     color={theme.colors.text}
                 />
             }
-            title={item.name}
+            title={item!.name}
             subtitle={datestamp}
         />
     );
