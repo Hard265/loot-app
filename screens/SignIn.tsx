@@ -26,9 +26,7 @@ export default function SignIn() {
             onCompleted(data) {
                 if ("tokenAuth" in data) setUser(data.tokenAuth!);
             },
-            onError(error) {
-                console.log(error.networkError?.message);
-            },
+            fetchPolicy: "no-cache",
         },
     );
 

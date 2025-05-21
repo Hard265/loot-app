@@ -7,7 +7,12 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import dayjs from "dayjs";
 import React from "react";
-import { DocumentIcon, FolderIcon } from "react-native-heroicons/outline";
+import {
+    DocumentIcon,
+    FolderIcon,
+    UserGroupIcon,
+    UsersIcon,
+} from "react-native-heroicons/outline";
 
 interface FolderListItemProps {
     item: NonNullable<GetFolderContentsQuery["contents"]>[number];
@@ -30,6 +35,19 @@ export default function FolderListItem({ item }: FolderListItemProps) {
             }
             title={item.name}
             subtitle={datestamp}
+            subtitleLeading={
+                item.hasShareLinks ? (
+                    <UserGroupIcon
+                        size={16}
+                        color={theme.colors.primary}
+                    />
+                ) : item.hasShares ? (
+                    <UsersIcon
+                        size={16}
+                        color={theme.colors.primary}
+                    />
+                ) : undefined
+            }
             trailing={formatBytes(item.size, 1)}
             onLongTap={() => showItemContext(item!)}
         />

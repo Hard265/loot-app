@@ -14,6 +14,7 @@ import { setBackgroundColorAsync } from "expo-system-ui";
 import colors from "tailwindcss/colors";
 import { ApolloProvider } from "@apollo/client";
 import graphql from "./services/graphql";
+import StoreProvider from "./providers/StoreProvider";
 
 export default function App() {
     const colorScheme = useColorScheme();
@@ -105,13 +106,17 @@ export default function App() {
 
     return (
         <ApolloProvider client={graphql}>
-            <GestureHandlerRootView style={{ flex: 1 }}>
+            <StoreProvider>
                 <AuthContext.Provider value={authContext}>
                     <SignInContext.Provider value={isSignedIn}>
-                        <Navigation theme={getTheme(colorScheme === "dark")} />
+                        <GestureHandlerRootView style={{ flex: 1 }}>
+                            <Navigation
+                                theme={getTheme(colorScheme === "dark")}
+                            />
+                        </GestureHandlerRootView>
                     </SignInContext.Provider>
                 </AuthContext.Provider>
-            </GestureHandlerRootView>
+            </StoreProvider>
         </ApolloProvider>
     );
 }

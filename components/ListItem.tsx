@@ -1,6 +1,6 @@
 import { cssInterop } from "nativewind";
 import { ReactNode, useState } from "react";
-import { View, TextInput } from "react-native";
+import { View, TextInput, ActivityIndicator } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Text from "./Text";
 import Animated, {
@@ -9,6 +9,7 @@ import Animated, {
     LinearTransition,
 } from "react-native-reanimated";
 import clsx from "clsx";
+import { useTheme } from "@react-navigation/native";
 
 cssInterop(RectButton, { className: "style" });
 
@@ -22,7 +23,9 @@ export default function ListItem(props: {
     icon?: ReactNode;
     onTap?(): void;
     onLongTap?(): void;
+    hasActivity?: boolean;
 }) {
+    const theme = useTheme();
     const [title, setTitle] = useState(props.title);
     const disabled = !(props.onTap || props.onLongTap);
     return (
@@ -41,7 +44,14 @@ export default function ListItem(props: {
                 className="flex flex-row items-center gap-4 p-4 py-3"
             >
                 <View className="h-6 w-6 items-center justify-center">
-                    {props.icon}
+                    {props.hasActivity && !props.icon ? (
+                        <ActivityIndicator
+                            color={theme.colors.primary}
+                            size="small"
+                        />
+                    ) : (
+                        props.icon
+                    )}
                 </View>
                 <View className="flex flex-1 flex-col">
                     <View>
