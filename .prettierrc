@@ -5,6 +5,7 @@
     "bracketSameLine": false,
     "useTabs": false,
     "trailingComma": "all",
+    "experimentalTernaries": true,
     "plugins": [
         "prettier-plugin-tailwindcss"
     ]

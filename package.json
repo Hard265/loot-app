@@ -8,8 +8,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "compile": "graphql-codegen",
-    "watch": "graphql-codegen -w"
+    "graphql-compile": "graphql-codegen",
+    "graphql-watch": "graphql-codegen -w",
+    "prettier-watch": "onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",

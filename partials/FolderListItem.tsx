@@ -25,48 +25,46 @@ export default function FolderListItem({ item }: FolderListItemProps) {
         useNavigation<NativeStackNavigationProp<RootStackT, "Folder">>();
     const datestamp = dayjs(item?.createdAt).format("MMM DD, YYYY");
 
-    return item?.__typename === "FileType" ? (
-        <ListItem
-            icon={
-                <DocumentIcon
-                    size={28}
-                    color={theme.colors.text}
-                />
-            }
-            title={item.name}
-            subtitle={datestamp}
-            subtitleLeading={
-                item.hasShareLinks ? (
-                    <UserGroupIcon
-                        size={16}
-                        color={theme.colors.primary}
+    return item?.__typename === "FileType" ?
+            <ListItem
+                icon={
+                    <DocumentIcon
+                        size={28}
+                        color={theme.colors.text}
                     />
-                ) : item.hasShares ? (
-                    <UsersIcon
-                        size={16}
-                        color={theme.colors.primary}
+                }
+                title={item.name}
+                subtitle={datestamp}
+                subtitleLeading={
+                    item.hasShareLinks ?
+                        <UserGroupIcon
+                            size={16}
+                            color={theme.colors.primary}
+                        />
+                    : item.hasShares ?
+                        <UsersIcon
+                            size={16}
+                            color={theme.colors.primary}
+                        />
+                    :   undefined
+                }
+                trailing={formatBytes(item.size, 1)}
+                onLongTap={() => showItemContext(item!)}
+            />
+        :   <ListItem
+                onTap={() => {
+                    navigation.push("Folder", {
+                        id: item!.id,
+                    });
+                }}
+                onLongTap={() => showItemContext(item!)}
+                icon={
+                    <FolderIcon
+                        size={28}
+                        color={theme.colors.text}
                     />
-                ) : undefined
-            }
-            trailing={formatBytes(item.size, 1)}
-            onLongTap={() => showItemContext(item!)}
-        />
-    ) : (
-        <ListItem
-            onTap={() => {
-                navigation.push("Folder", {
-                    id: item!.id,
-                });
-            }}
-            onLongTap={() => showItemContext(item!)}
-            icon={
-                <FolderIcon
-                    size={28}
-                    color={theme.colors.text}
-                />
-            }
-            title={item!.name}
-            subtitle={datestamp}
-        />
-    );
+                }
+                title={item!.name}
+                subtitle={datestamp}
+            />;
 }
