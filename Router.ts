@@ -1,21 +1,17 @@
 import { createStaticNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useIsSignedIn, useIsSignedOut } from "./hooks/useIsSigned";
+import ItemContextLayout from "./layouts/ItemContextLayout";
+import PlusFabLayout from "./layouts/PlusFabLayout";
 import SignedOutHeaderRight from "./partials/SignedOutHeaderRight";
+import OptionsProvider from "./providers/OptionsProvider";
 import Folder from "./screens/Folder";
 import Home from "./screens/Home";
 import PasswordReset from "./screens/PasswordReset";
 import Register from "./screens/Register";
-import SignIn from "./screens/SignIn";
-import PlusFabLayout from "./layouts/PlusFabLayout";
-import User from "./screens/User";
-import ItemContextLayout from "./layouts/ItemContextLayout";
 import ShareScreen from "./screens/Share";
-
-enum entity {
-    file = "file",
-    folder = "folder",
-}
+import SignIn from "./screens/SignIn";
+import User from "./screens/User";
 
 type RootStackT = {
     SignIn: undefined;
@@ -24,44 +20,51 @@ type RootStackT = {
     Info: {
         id: string;
         data: any;
-        type: entity;
+        type: "file" | "folder";
     };
     User: undefined;
     Register: undefined;
     ResetPassword: {
         email?: string;
     };
+    Share: undefined;
 };
 
 const RootStack = createNativeStackNavigator({
     groups: {
         SignedOut: {
             if: useIsSignedOut,
-            screens: { SignIn, Register, PasswordReset },
+            screens: {
+                SignIn: SignIn,
+                Register: Register,
+                ResetPassword: PasswordReset,
+            },
             screenOptions: {
                 headerShadowVisible: false,
                 animation: "slide_from_right",
-                headerRight: (props) => SignedOutHeaderRight(props),
+                headerRight: SignedOutHeaderRight,
                 title: "",
             },
         },
         SignedIn: {
             if: useIsSignedIn,
             screens: {
-                Home,
-                Folder,
-                User,
-                ShareScreen,
+                Home: Home,
+                Folder: Folder,
+                User: User,
+                Share: ShareScreen,
             },
-            // screenLayout: (props) => ItemContextLayout(props),
             screenOptions: {
                 headerShadowVisible: false,
                 animation: "slide_from_right",
             },
         },
     },
-    layout: (props) => ItemContextLayout({ children: PlusFabLayout(props) }),
+    layout: (props) =>
+        OptionsProvider({
+            children: ItemContextLayout({ children: PlusFabLayout(props) }),
+        }),
 });
 
 const Navigation = createStaticNavigation(RootStack);
-export { Navigation as default, RootStackT };
+export { Navigation as default, type RootStackT };
