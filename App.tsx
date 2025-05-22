@@ -124,10 +124,15 @@ function getTheme(dark: boolean): Theme {
                     ...DarkTheme.colors,
                     background: colors.black,
                     card: colors.black,
+                    border: "rgb(38, 38, 38)",
                 },
             }
         :   {
                 ...DefaultTheme,
-                colors: { ...DefaultTheme.colors, background: colors.white },
+                colors: {
+                    ...DefaultTheme.colors,
+                    background: colors.white,
+                    border: colors.white,
+                },
             };
 }

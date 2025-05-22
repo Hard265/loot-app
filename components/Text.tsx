@@ -32,15 +32,21 @@ const defaults: Required<TextProps> = {
 interface TextProps {
     variant?: keyof typeof variants;
     color?: keyof typeof colors;
+    singleLine?: boolean;
 }
 
 const Text: FC<PropsWithChildren<TextProps>> = ({
     children,
     variant = defaults.variant,
     color = defaults.color,
+    singleLine,
 }) => {
     return (
-        <RNText className={clsx(variants[variant], colors[color])}>
+        <RNText
+            numberOfLines={singleLine ? 1 : undefined}
+            ellipsizeMode="tail"
+            className={clsx(variants[variant], colors[color])}
+        >
             {children}
         </RNText>
     );

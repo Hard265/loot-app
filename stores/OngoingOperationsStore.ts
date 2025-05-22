@@ -58,10 +58,6 @@ class OngoingOperationsStore {
     getOngoingOperations() {
         return this.ongoingOperations$.asObservable();
     }
-
-    hasOngoingOperation() {
-        this.ongoingOperations$.
-    }
 }
 
 export const ongoingOpsStore = new OngoingOperationsStore();

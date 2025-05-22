@@ -24,14 +24,13 @@ import {
     UserGroupIcon,
     UserPlusIcon,
 } from "react-native-heroicons/outline";
-import { useStore } from "@/contexts/StoreContext";
 interface ItemSheetProps {
     ref: ForwardedRef<BottomSheet>;
     onClose?(): void;
 }
 
 cssInterop(BottomSheet, {
-    backgroundClassName: "backgroundStyle",
+    className: "backgroundStyle",
     handleIndicatorClassName: "handleIndicatorStyle",
 });
 
@@ -39,7 +38,6 @@ export default function ItemSheet(props: ItemSheetProps) {
     const theme = useTheme();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackT>>();
     const { data } = useItemContext();
-    const store = useStore();
     const [isShown, setIsShown] = useState(false);
 
     const handleSheetChange = (index: number) => {
@@ -70,13 +68,18 @@ export default function ItemSheet(props: ItemSheetProps) {
             backdropComponent={renderBackdrop}
             onChange={handleSheetChange}
             //@ts-ignore
-            backgroundClassName="bg-secondary rounded-none"
+            className="rounded-none bg-secondary"
             handleIndicatorClassName="bg-text"
             onClose={() => props.onClose?.()}
         >
             <BottomSheetView className="flex flex-col">
                 <View className="flex flex-col items-start p-4 pt-0.5">
-                    <Text variant="largeTitle">{data?.name}</Text>
+                    <Text
+                        variant="largeTitle"
+                        singleLine
+                    >
+                        {data?.name}
+                    </Text>
                     <Text>{timestamp}</Text>
                 </View>
 
@@ -88,12 +91,6 @@ export default function ItemSheet(props: ItemSheetProps) {
                             color={theme.colors.text}
                         />
                     }
-                    onTap={() => {
-                        store.nameEditing = {
-                            id: data?.id,
-                            type: data?.__typename!,
-                        };
-                    }}
                 />
                 <ListItem
                     title="Share"

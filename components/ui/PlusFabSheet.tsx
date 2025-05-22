@@ -18,7 +18,7 @@ import {
 } from "react-native-heroicons/outline";
 
 cssInterop(BottomSheet, {
-    backgroundClassName: "backgroundStyle",
+    className: "backgroundStyle",
     handleIndicatorClassName: "handleIndicatorStyle",
 });
 
@@ -121,7 +121,7 @@ export default function PlusFabSheet(props: PlusFabSheetProps) {
             backdropComponent={renderBackdrop}
             enablePanDownToClose
             //@ts-ignore
-            backgroundClassName="bg-secondary rounded-none"
+            className="bg-secondary rounded-none"
             handleIndicatorClassName="bg-text"
         >
             <BottomSheetView className="flex flex-row flex-wrap justify-evenly p-2">

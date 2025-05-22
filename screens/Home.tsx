@@ -2,7 +2,10 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable } from "react-native";
-import { ArrowDownIcon } from "react-native-heroicons/outline";
+import {
+    ArrowDownIcon,
+    CalendarDaysIcon,
+} from "react-native-heroicons/outline";
 import Animated, {
     FadeIn,
     FadeOut,
@@ -23,6 +26,7 @@ import {
 import FolderListItem from "@/components/ui/FolderListItem";
 import rootStore from "@/stores";
 import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
+import { showOptions } from "@/layouts/OptionsManagerLayout";
 
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
@@ -31,7 +35,33 @@ const SortMenu = () => {
 
     return (
         <>
-            <Pressable className="flex-row items-center gap-2 bg-background p-4">
+            <Pressable
+                onPress={() => {
+                    showOptions([
+                        {
+                            label: "Size",
+                            value: "size",
+                            icon: (
+                                <CalendarDaysIcon
+                                    size={24}
+                                    color={colors.text}
+                                />
+                            ),
+                        },
+                        {
+                            label: "Date Modified",
+                            value: "dateModified",
+                            icon: (
+                                <CalendarDaysIcon
+                                    size={24}
+                                    color={colors.text}
+                                />
+                            ),
+                        },
+                    ]);
+                }}
+                className="flex-row items-center p-4 gap-2 bg-background"
+            >
                 <Text variant="title3">Name</Text>
                 <ArrowDownIcon
                     size={16}

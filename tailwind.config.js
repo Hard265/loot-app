@@ -3,9 +3,9 @@
 module.exports = {
     content: [
         "./App.tsx",
-        "./components/**/*.tsx",
         "./layouts/**/*.tsx",
-        "./partials/**/*.tsx",
+        "./components/**/*.tsx",
+        "./components/ui/*.tsx",
         "./screens/**/*.tsx",
         "./providers/**/*.tsx",
     ],

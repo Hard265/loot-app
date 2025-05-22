@@ -36,6 +36,7 @@ import Animated, {
 import { RectButton } from "react-native-gesture-handler";
 import {
     GetFolderContentsDocument,
+    PutFileDocument,
     PutFolderDocument,
 } from "@/__generated__/schema/graphql";
 import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
@@ -58,8 +59,8 @@ const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
 
 const ListHeader: FC<{ title: string }> = (props) => {
     return (
-        <View className="w-ful flex flex-col">
-            <View className="flex items-center justify-center pb-2 pt-4">
+        <View className="flex flex-col w-ful">
+            <View className="flex items-center justify-center pt-4 pb-2">
                 <Text variant="largeTitle">{props.title}</Text>
             </View>
             <SortMenu />
@@ -71,7 +72,7 @@ const SortMenu = () => {
     const { colors } = useTheme();
 
     return (
-        <Pressable className="flex-row items-center gap-2 bg-background p-4">
+        <Pressable className="flex-row items-center p-4 gap-2 bg-background">
             <Text variant="title3">Name</Text>
             <ArrowDownIcon
                 size={16}
@@ -149,6 +150,28 @@ export default function Folder() {
         (item): item is NonNullable<typeof item> => item !== null,
     );
 
+    const handleSubmit = (
+        id: string,
+        name: string,
+        type: "FileType" | "FolderType",
+    ): void => {
+        ongoingOpsStore.trackOperation("update", id);
+        switch (type) {
+            case "FileType":
+                updateFile({
+                    variables: {
+                        id,
+                        name,
+                    },
+                });
+                break;
+            case "FolderType":
+                updateFolder({
+                    variables: { id, name },
+                });
+                break;
+        }
+    };
     return (
         <Animated.FlatList
             data={list}
@@ -157,23 +180,9 @@ export default function Folder() {
                     <FolderListItem
                         item={item}
                         hasActiveOperation={ongoingOperations.has(item.id)}
-                        onSubmitEditing={(str) => {
-                            ongoingOpsStore.trackOperation("update", item.id);
-                            switch (item.__typename) {
-                                case "FileType":
-                                    updateFile({
-                                        variables: {
-                                            id: item.id,
-                                        },
-                                    });
-                                    break;
-                                case "FolderType":
-                                    updateFolder({
-                                        variables: { id: item.id, name: str },
-                                    });
-                                    break;
-                            }
-                        }}
+                        onSubmitEditing={(name) =>
+                            handleSubmit(item.id, name, item.__typename!)
+                        }
                     />
                 )
             }

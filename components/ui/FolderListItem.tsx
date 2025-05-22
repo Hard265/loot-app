@@ -38,13 +38,13 @@ export default function FolderListItem({
     const renderIsSharedIcon =
         item?.hasShareLinks ?
             <UserGroupIcon
-                size={16}
-                color={theme.colors.primary}
+                size={14}
+                color={theme.colors.text}
             />
         : item?.hasShares ?
             <UsersIcon
-                size={16}
-                color={theme.colors.primary}
+                size={14}
+                color={theme.colors.text}
             />
         :   undefined;
 
