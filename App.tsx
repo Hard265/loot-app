@@ -1,20 +1,19 @@
 import "./global.css";
 
+import { ApolloProvider } from "@apollo/client";
 import { DarkTheme, DefaultTheme, Theme } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SecureStore from "expo-secure-store";
+import { setBackgroundColorAsync } from "expo-system-ui";
 import { useEffect, useMemo, useReducer } from "react";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import colors from "tailwindcss/colors";
 import Navigation from "./Router";
 import { AuthContext, authData } from "./contexts/AuthContext";
 import { SignInContext } from "./contexts/SignInContext";
-import store from "./stores";
-import { setBackgroundColorAsync } from "expo-system-ui";
-import colors from "tailwindcss/colors";
-import { ApolloProvider } from "@apollo/client";
 import graphql from "./services/graphql";
-import StoreProvider from "./providers/StoreProvider";
+import store from "./stores";
 
 export default function App() {
     const colorScheme = useColorScheme();
@@ -106,33 +105,29 @@ export default function App() {
 
     return (
         <ApolloProvider client={graphql}>
-            <StoreProvider>
-                <AuthContext.Provider value={authContext}>
-                    <SignInContext.Provider value={isSignedIn}>
-                        <GestureHandlerRootView style={{ flex: 1 }}>
-                            <Navigation
-                                theme={getTheme(colorScheme === "dark")}
-                            />
-                        </GestureHandlerRootView>
-                    </SignInContext.Provider>
-                </AuthContext.Provider>
-            </StoreProvider>
+            <AuthContext.Provider value={authContext}>
+                <SignInContext.Provider value={isSignedIn}>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <Navigation theme={getTheme(colorScheme === "dark")} />
+                    </GestureHandlerRootView>
+                </SignInContext.Provider>
+            </AuthContext.Provider>
         </ApolloProvider>
     );
 }
 
 function getTheme(dark: boolean): Theme {
-    return dark
-        ? {
-              ...DarkTheme,
-              colors: {
-                  ...DarkTheme.colors,
-                  background: colors.black,
-                  card: colors.black,
-              },
-          }
-        : {
-              ...DefaultTheme,
-              colors: { ...DefaultTheme.colors, background: colors.white },
-          };
+    return dark ?
+            {
+                ...DarkTheme,
+                colors: {
+                    ...DarkTheme.colors,
+                    background: colors.black,
+                    card: colors.black,
+                },
+            }
+        :   {
+                ...DefaultTheme,
+                colors: { ...DefaultTheme.colors, background: colors.white },
+            };
 }

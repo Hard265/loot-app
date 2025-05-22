@@ -1,6 +1,6 @@
 import Text from "@/components/Text";
 import { RootStackT } from "@/Router";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import {
     RouteProp,
     useNavigation,
@@ -33,9 +33,13 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
 } from "react-native-reanimated";
-import FolderListItem from "@/partials/FolderListItem";
 import { RectButton } from "react-native-gesture-handler";
-import { GetFolderContentsDocument } from "@/__generated__/schema/graphql";
+import {
+    GetFolderContentsDocument,
+    PutFolderDocument,
+} from "@/__generated__/schema/graphql";
+import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
+import FolderListItem from "@/components/ui/FolderListItem";
 
 const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
     props,
@@ -82,28 +86,21 @@ export default function Folder() {
     const route = useRoute<RouteProp<RootStackT, "Folder">>();
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackT, "Folder">>();
-
     const titleOffset = useSharedValue(32);
     const titleOffsetStyle = useAnimatedStyle(() => ({
         transform: [{ translateY: titleOffset.value }],
     }));
-
     const { data, loading, refetch } = useQuery(GetFolderContentsDocument, {
         variables: {
             id: route.params.id,
         },
     });
-
     const [refreshing, setRefreshing] = useState(false);
-
-    const onRefresh = useCallback(async () => {
-        setRefreshing(true);
-        try {
-            await refetch();
-        } finally {
-            setRefreshing(false);
-        }
-    }, [refetch]);
+    const [updateFile] = useMutation(PutFileDocument);
+    const [updateFolder] = useMutation(PutFolderDocument);
+    const [ongoingOperations, setOngoingOperations] = useState<Set<string>>(
+        new Set(),
+    );
 
     useEffect(() => {
         navigation.setOptions({
@@ -119,6 +116,15 @@ export default function Folder() {
         });
     }, [data, navigation, titleOffsetStyle]);
 
+    useEffect(() => {
+        const subscriber = ongoingOpsStore
+            .getOngoingOperations()
+            .subscribe((operations) => {
+                setOngoingOperations(operations.get("update") || new Set());
+            });
+        return subscriber.unsubscribe;
+    }, []);
+
     const scrollHandler = useAnimatedScrollHandler({
         onScroll(e) {
             titleOffset.value = interpolate(
@@ -130,6 +136,15 @@ export default function Folder() {
         },
     });
 
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        try {
+            await refetch();
+        } finally {
+            setRefreshing(false);
+        }
+    }, [refetch]);
+
     const list = (data?.contents ?? []).filter(
         (item): item is NonNullable<typeof item> => item !== null,
     );
@@ -137,7 +152,31 @@ export default function Folder() {
     return (
         <Animated.FlatList
             data={list}
-            renderItem={({ item }) => <FolderListItem item={item} />}
+            renderItem={({ item }) =>
+                item && (
+                    <FolderListItem
+                        item={item}
+                        hasActiveOperation={ongoingOperations.has(item.id)}
+                        onSubmitEditing={(str) => {
+                            ongoingOpsStore.trackOperation("update", item.id);
+                            switch (item.__typename) {
+                                case "FileType":
+                                    updateFile({
+                                        variables: {
+                                            id: item.id,
+                                        },
+                                    });
+                                    break;
+                                case "FolderType":
+                                    updateFolder({
+                                        variables: { id: item.id, name: str },
+                                    });
+                                    break;
+                            }
+                        }}
+                    />
+                )
+            }
             refreshControl={
                 <RefreshControl
                     refreshing={refreshing}
@@ -153,7 +192,7 @@ export default function Folder() {
                 <ListHeader title={data?.folderById?.name || ""} />
             }
             ListFooterComponent={
-                loading ? (
+                loading ?
                     <Animated.View
                         entering={FadeIn}
                         exiting={FadeOut}
@@ -165,7 +204,7 @@ export default function Folder() {
                             color={theme.colors.primary}
                         />
                     </Animated.View>
-                ) : null
+                :   null
             }
         />
     );

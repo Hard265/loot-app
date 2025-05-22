@@ -19,6 +19,7 @@ interface FolderListItemProps {
     onSubmitEditing?(name: string): void;
     editing?: boolean;
     onCancelEditing?(): void;
+    hasActiveOperation?: boolean;
 }
 
 export default function FolderListItem({
@@ -26,6 +27,7 @@ export default function FolderListItem({
     editing,
     onCancelEditing,
     onSubmitEditing,
+    hasActiveOperation,
 }: FolderListItemProps) {
     const { showItemContext } = useItemContext();
     const theme = useTheme();
@@ -46,7 +48,7 @@ export default function FolderListItem({
             />
         :   undefined;
 
-    const handleRename = (name: string) => {
+    const handleSubmit = (name: string) => {
         const _name = name.trim();
         if (_name === "") return onCancelEditing?.();
         onSubmitEditing?.(_name);
@@ -61,12 +63,13 @@ export default function FolderListItem({
                     />
                 }
                 editing={editing}
-                onSubmit={(str: string) => handleRename(str)}
+                onSubmit={(str: string) => handleSubmit(str)}
                 title={item.name}
                 subtitle={datestamp}
                 subtitleLeading={renderIsSharedIcon}
                 trailing={formatBytes(item.size, 1)}
                 onLongTap={() => showItemContext(item!)}
+                hasActivity={hasActiveOperation}
             />
         :   <ListItem
                 onTap={() => {
@@ -82,9 +85,10 @@ export default function FolderListItem({
                     />
                 }
                 editing={editing}
-                onSubmit={(str: string) => handleRename(str)}
+                onSubmit={(str: string) => handleSubmit(str)}
                 title={item!.name}
                 subtitle={datestamp}
                 subtitleLeading={renderIsSharedIcon}
+                hasActivity={hasActiveOperation}
             />;
 }

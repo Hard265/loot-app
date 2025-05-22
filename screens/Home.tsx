@@ -8,20 +8,21 @@ import Animated, {
     FadeOut,
     LinearTransition,
 } from "react-native-reanimated";
+import { observer } from "mobx-react-lite";
 import Text from "@/components/Text";
 import Avatar from "@/components/Avatar";
 import { RootStackT } from "@/Router";
 import { getGravatarUri } from "@/utils";
 import { useMutation, useQuery } from "@apollo/client";
 import { RectButton } from "react-native-gesture-handler";
-import FolderListItem from "@/partials/FolderListItem";
 import {
     GetRootContentsDocument,
     PutFolderDocument,
     PutFileDocument,
 } from "@/__generated__/schema/graphql";
-import { useStore } from "@/contexts/StoreContext";
+import FolderListItem from "@/components/ui/FolderListItem";
 import rootStore from "@/stores";
+import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
 
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
@@ -41,16 +42,19 @@ const SortMenu = () => {
     );
 };
 
-export default function Home() {
+function Home() {
     const theme = useTheme();
     const navigation = useNavigation<NavigationProp>();
-    const store = useStore();
     const [userImage, setUserImage] = useState("");
     const { data, loading, refetch } = useQuery(GetRootContentsDocument);
+    const [refetching, setRefetching] = useState(false);
+
     const [updateFile] = useMutation(PutFileDocument);
     const [updateFolder] = useMutation(PutFolderDocument);
 
-    const [refetching, setRefetching] = useState(false);
+    const [ongoingOperations, setOngoingOperations] = useState<Set<string>>(
+        new Set(),
+    );
 
     useEffect(() => {
         (async () => {
@@ -77,16 +81,26 @@ export default function Home() {
         });
     }, [navigation, userImage]);
 
+    useEffect(() => {
+        const subscriber = ongoingOpsStore
+            .getOngoingOperations()
+            .subscribe((operations) => {
+                setOngoingOperations(operations.get("update") || new Set());
+            });
+        return subscriber.unsubscribe;
+    }, []);
+
     const handleRefetch = () => {
         setRefetching(true);
         refetch().finally(() => setRefetching(false));
     };
 
-    const handleRename = (
+    const handleSubmitRename = (
         id: unknown,
         name: string,
         type?: "FileType" | "FolderType",
     ) => {
+        ongoingOpsStore.trackOperation("update", id as string);
         switch (type) {
             case "FileType":
                 updateFile({ variables: { id, name } });
@@ -95,7 +109,6 @@ export default function Home() {
                 updateFolder({ variables: { id, name } });
                 break;
         }
-        store.nameEditing = null;
     };
 
     const dataParsed = data?.contents || [];
@@ -104,18 +117,17 @@ export default function Home() {
         <Animated.FlatList
             data={dataParsed}
             keyExtractor={(item) => item?.id}
-            renderItem={({ item }) => (
-                <FolderListItem
-                    item={item}
-                    editing={store.nameEditing?.id === item?.id}
-                    onSubmitEditing={(name) =>
-                        handleRename(item?.id, name, item?.__typename)
-                    }
-                    onCancelEditing={() => {
-                        store.nameEditing = null;
-                    }}
-                />
-            )}
+            renderItem={({ item }) =>
+                item && (
+                    <FolderListItem
+                        item={item}
+                        onSubmitEditing={(name) =>
+                            handleSubmitRename(item.id, name, item.__typename)
+                        }
+                        hasActiveOperation={ongoingOperations.has(item.id)}
+                    />
+                )
+            }
             stickyHeaderIndices={[0]}
             onRefresh={handleRefetch}
             refreshing={refetching}
@@ -134,14 +146,8 @@ export default function Home() {
                     </Animated.View>
                 :   null
             }
-            ListHeaderComponent={
-                <SortMenu />
-                // <View>
-                //     <Pressable onPress={() => signOut()}>
-                //         <Text>logout</Text>
-                //     </Pressable>
-                // </View>
-            }
+            ListHeaderComponent={<SortMenu />}
         />
     );
 }
+export default Home;

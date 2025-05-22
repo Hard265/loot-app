@@ -17,11 +17,6 @@ type RootStackT = {
     SignIn: undefined;
     Home: undefined;
     Folder: { id: string };
-    Info: {
-        id: string;
-        data: any;
-        type: "file" | "folder";
-    };
     User: undefined;
     Register: undefined;
     ResetPassword: {
