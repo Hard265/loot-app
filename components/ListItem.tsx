@@ -69,7 +69,7 @@ export default function ListItem(props: {
                             />
                         }
                     </View>
-                    {props.editing &&
+                    {!props.editing &&
                         (props.subtitle ||
                             props.trailing ||
                             props.subtitleLeading) && (

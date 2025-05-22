@@ -7,6 +7,7 @@ module.exports = {
         "./layouts/**/*.tsx",
         "./partials/**/*.tsx",
         "./screens/**/*.tsx",
+        "./providers/**/*.tsx",
     ],
     presets: [require("nativewind/preset")],
     theme: {

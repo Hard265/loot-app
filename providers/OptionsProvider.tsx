@@ -22,8 +22,8 @@ import { cssInterop } from "nativewind";
 import Text from "@/components/Text";
 
 cssInterop(BottomSheet, {
-    className: "backgroundStyle",
-    indicatorClassName: "handleIndicatorStyle",
+    backgroundClassName: "backgroundStyle",
+    handleIndicatorClassName: "handleIndicatorStyle",
 });
 
 export default function OptionsProvider({ children }: PropsWithChildren) {
@@ -99,8 +99,9 @@ export default function OptionsProvider({ children }: PropsWithChildren) {
                 index={-1}
                 enablePanDownToClose
                 onClose={handleClose}
-                className="rounded-none bg-secondary"
-                indicatorClassName="bg-text"
+                //@ts-ignore
+                backgroundClassName="bg-secondary rounded-none"
+                handleIndicatorClassName="bg-text"
             >
                 <BottomSheetView className="p-4">
                     {config?.title && (

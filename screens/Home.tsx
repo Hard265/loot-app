@@ -103,14 +103,11 @@ export default function Home() {
     return (
         <Animated.FlatList
             data={dataParsed}
-            keyExtractor={(_, index) => index.toString()}
-            contentContainerClassName="pb-[2000]"
+            keyExtractor={(item) => item?.id}
             renderItem={({ item }) => (
                 <FolderListItem
                     item={item}
-                    editing={
-                        !!store.nameEditing && store.nameEditing.id === item?.id
-                    }
+                    editing={store.nameEditing?.id === item?.id}
                     onSubmitEditing={(name) =>
                         handleRename(item?.id, name, item?.__typename)
                     }
