@@ -1,9 +1,6 @@
 import { createContext, useContext } from "react";
 
-export enum nameEditingType {
-    FileType,
-    FolderType,
-}
+export type nameEditingType = "FileType" | "FolderType";
 
 interface StoreContextType {
     nameEditing: {

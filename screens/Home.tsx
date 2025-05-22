@@ -8,17 +8,20 @@ import Animated, {
     FadeOut,
     LinearTransition,
 } from "react-native-reanimated";
-
 import Text from "@/components/Text";
 import Avatar from "@/components/Avatar";
-import { File, Folder } from "@/global";
 import { RootStackT } from "@/Router";
-import store from "@/stores";
 import { getGravatarUri } from "@/utils";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { RectButton } from "react-native-gesture-handler";
 import FolderListItem from "@/partials/FolderListItem";
-import { GetRootContentsDocument } from "@/__generated__/schema/graphql";
+import {
+    GetRootContentsDocument,
+    PutFolderDocument,
+    PutFileDocument,
+} from "@/__generated__/schema/graphql";
+import { useStore } from "@/contexts/StoreContext";
+import rootStore from "@/stores";
 
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
@@ -41,23 +44,18 @@ const SortMenu = () => {
 export default function Home() {
     const theme = useTheme();
     const navigation = useNavigation<NavigationProp>();
+    const store = useStore();
     const [userImage, setUserImage] = useState("");
-    const { data, loading, error, refetch } = useQuery(
-        GetRootContentsDocument,
-        {
-            onError: (e) => {
-                console.log(e);
-            },
-        },
-    );
-    console.log(error);
+    const { data, loading, refetch } = useQuery(GetRootContentsDocument);
+    const [updateFile] = useMutation(PutFileDocument);
+    const [updateFolder] = useMutation(PutFolderDocument);
 
     const [refetching, setRefetching] = useState(false);
 
     useEffect(() => {
         (async () => {
             setUserImage(
-                await getGravatarUri(store.authStore.user?.email!, 80),
+                await getGravatarUri(rootStore.authStore.user?.email!, 80),
             );
         })();
     }, []);
@@ -84,6 +82,22 @@ export default function Home() {
         refetch().finally(() => setRefetching(false));
     };
 
+    const handleRename = (
+        id: unknown,
+        name: string,
+        type?: "FileType" | "FolderType",
+    ) => {
+        switch (type) {
+            case "FileType":
+                updateFile({ variables: { id, name } });
+                break;
+            case "FolderType":
+                updateFolder({ variables: { id, name } });
+                break;
+        }
+        store.nameEditing = null;
+    };
+
     const dataParsed = data?.contents || [];
 
     return (
@@ -91,12 +105,25 @@ export default function Home() {
             data={dataParsed}
             keyExtractor={(_, index) => index.toString()}
             contentContainerClassName="pb-[2000]"
-            renderItem={({ item }) => <FolderListItem item={item} />}
+            renderItem={({ item }) => (
+                <FolderListItem
+                    item={item}
+                    editing={
+                        !!store.nameEditing && store.nameEditing.id === item?.id
+                    }
+                    onSubmitEditing={(name) =>
+                        handleRename(item?.id, name, item?.__typename)
+                    }
+                    onCancelEditing={() => {
+                        store.nameEditing = null;
+                    }}
+                />
+            )}
             stickyHeaderIndices={[0]}
             onRefresh={handleRefetch}
             refreshing={refetching}
             ListFooterComponent={
-                loading ? (
+                loading ?
                     <Animated.View
                         entering={FadeIn}
                         exiting={FadeOut}
@@ -108,7 +135,7 @@ export default function Home() {
                             color={theme.colors.primary}
                         />
                     </Animated.View>
-                ) : null
+                :   null
             }
             ListHeaderComponent={
                 <SortMenu />

@@ -14,7 +14,7 @@ import { useTheme } from "@react-navigation/native";
 cssInterop(RectButton, { className: "style" });
 
 export default function ListItem(props: {
-    editing?: string;
+    editing?: boolean;
     onSubmit?(title: string): void;
     title: string;
     subtitle?: string;
@@ -44,46 +44,51 @@ export default function ListItem(props: {
                 className="flex flex-row items-center gap-4 p-4 py-3"
             >
                 <View className="h-6 w-6 items-center justify-center">
-                    {props.hasActivity && !props.icon ? (
+                    {props.hasActivity && !props.icon ?
                         <ActivityIndicator
                             color={theme.colors.primary}
                             size="small"
                         />
-                    ) : (
-                        props.icon
-                    )}
+                    :   props.icon}
                 </View>
                 <View className="flex flex-1 flex-col">
                     <View>
-                        {!props.editing ? (
+                        {!props.editing ?
                             <Text variant="title3">{props.title}</Text>
-                        ) : (
-                            <TextInput
+                        :   <TextInput
                                 value={title}
                                 onChangeText={setTitle}
                                 onSubmitEditing={() => props.onSubmit?.(title)}
                                 multiline={false}
-                                className="p-1 font-[MontrealMedium] text-xl text-text focus:border-2 focus:border-primary"
+                                autoFocus
+                                autoCapitalize="none"
+                                enablesReturnKeyAutomatically
+                                selectTextOnFocus
+                                onBlur={() => props.onSubmit?.("")}
+                                className="p-2.5 font-[MontrealMedium] text-xl text-text focus:border-2 focus:border-primary"
                             />
-                        )}
+                        }
                     </View>
-                    {(props.subtitle ||
-                        props.trailing ||
-                        props.subtitleLeading) && (
-                        <View className="flex flex-row items-center justify-between">
-                            <View className="flex flex-row items-center gap-2">
-                                {props.subtitleLeading}
-                                {props.subtitle && (
+                    {props.editing &&
+                        (props.subtitle ||
+                            props.trailing ||
+                            props.subtitleLeading) && (
+                            <View className="flex flex-row items-center justify-between">
+                                <View className="flex flex-row items-center gap-2">
+                                    {props.subtitleLeading}
+                                    {props.subtitle && (
+                                        <Text variant="callout">
+                                            {props.subtitle}
+                                        </Text>
+                                    )}
+                                </View>
+                                {props.trailing && (
                                     <Text variant="callout">
-                                        {props.subtitle}
+                                        {props.trailing}
                                     </Text>
                                 )}
                             </View>
-                            {props.trailing && (
-                                <Text variant="callout">{props.trailing}</Text>
-                            )}
-                        </View>
-                    )}
+                        )}
                 </View>
             </RectButton>
         </Animated.View>

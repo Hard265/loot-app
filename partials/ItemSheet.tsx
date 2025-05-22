@@ -24,7 +24,7 @@ import {
     UserGroupIcon,
     UserPlusIcon,
 } from "react-native-heroicons/outline";
-
+import { useStore } from "@/contexts/StoreContext";
 interface ItemSheetProps {
     ref: ForwardedRef<BottomSheet>;
     onClose?(): void;
@@ -39,6 +39,7 @@ export default function ItemSheet(props: ItemSheetProps) {
     const theme = useTheme();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackT>>();
     const { data } = useItemContext();
+    const store = useStore();
     const [isShown, setIsShown] = useState(false);
 
     const handleSheetChange = (index: number) => {
@@ -87,6 +88,12 @@ export default function ItemSheet(props: ItemSheetProps) {
                             color={theme.colors.text}
                         />
                     }
+                    onTap={() => {
+                        store.nameEditing = {
+                            id: data?.id,
+                            type: data?.__typename!,
+                        };
+                    }}
                 />
                 <ListItem
                     title="Share"
