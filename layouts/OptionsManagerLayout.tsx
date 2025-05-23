@@ -19,7 +19,7 @@ import ListItem from "@/components/ListItem";
 import Text from "@/components/Text";
 import { cssInterop } from "nativewind";
 
-interface Option<T = unknown> {
+export interface Option<T = unknown> {
     label: string;
     icon?: ReactNode;
     value: T;
@@ -38,14 +38,18 @@ const optionsSubject = new BehaviorSubject<{
     items: Option[];
     config?: OptionsConfig;
 } | null>(null);
-let optionsResolver: ((value: unknown) => void) | null = null;
+let optionsResolver: (<T = any>(value: T) => void) | null = null;
 
-export const showOptions = (items: Option[], config?: OptionsConfig) => {
+export function showOptions<T>(
+    items: Option<T>[],
+    config?: OptionsConfig,
+): Promise<T | null> {
     return new Promise((resolve) => {
+        //@ts-ignore
         optionsResolver = resolve;
         optionsSubject.next({ items, config });
     });
-};
+}
 
 export const hideOptions = () => {
     if (optionsResolver) optionsResolver(null);

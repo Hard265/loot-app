@@ -24,9 +24,17 @@ import {
     UserGroupIcon,
     UserPlusIcon,
 } from "react-native-heroicons/outline";
+
 interface ItemSheetProps {
     ref: ForwardedRef<BottomSheet>;
     onClose?(): void;
+}
+
+interface MenuItem {
+    title: string;
+    icon: React.ReactNode;
+    onTap?: () => void;
+    hidden?: boolean;
 }
 
 cssInterop(BottomSheet, {
@@ -37,16 +45,17 @@ cssInterop(BottomSheet, {
 export default function ItemSheet(props: ItemSheetProps) {
     const theme = useTheme();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackT>>();
-    const { data } = useItemContext();
+    const { data, hideContext } = useItemContext();
     const [isShown, setIsShown] = useState(false);
 
     const handleSheetChange = (index: number) => {
         setIsShown(index >= 0);
     };
-    useBackHandler(isShown, () => {
+    const close = () => {
         //@ts-ignore
         props.ref.current?.close();
-    });
+    };
+    useBackHandler(isShown, close);
 
     const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => {
         return (
@@ -60,6 +69,95 @@ export default function ItemSheet(props: ItemSheetProps) {
 
     const isFile = data?.__typename === "FileType";
     const timestamp = dayjs(data?.createdAt).format("MMM DD, YYYY");
+
+    const menuItems: MenuItem[] = [
+        {
+            title: "Rename",
+            icon: (
+                <PencilIcon
+                    size={20}
+                    color={theme.colors.text}
+                />
+            ),
+        },
+        {
+            title: "Share",
+            onTap() {
+                navigation.navigate("Share", {
+                    type: isFile ? "FileType" : "FolderType",
+                    id: data?.id!,
+                });
+            },
+            icon: (
+                <UserPlusIcon
+                    size={20}
+                    color={theme.colors.text}
+                />
+            ),
+        },
+        {
+            title: "Manage access",
+            icon: (
+                <UserGroupIcon
+                    size={20}
+                    color={theme.colors.text}
+                />
+            ),
+        },
+        {
+            title: "Move",
+            icon: (
+                <ArrowsPointingOutIcon
+                    size={20}
+                    color={theme.colors.text}
+                />
+            ),
+        },
+        {
+            title: "Make available offline",
+            icon: (
+                <CloudArrowDownIcon
+                    size={20}
+                    color={theme.colors.text}
+                />
+            ),
+        },
+        {
+            title: "Download",
+            icon: (
+                <ArrowDownTrayIcon
+                    size={20}
+                    color={theme.colors.text}
+                />
+            ),
+        },
+        {
+            title: `${isFile ? "File" : "Folder"} details`,
+            icon: (
+                <ExclamationCircleIcon
+                    size={20}
+                    color={theme.colors.text}
+                />
+            ),
+            onTap: () => {
+                // navigation.navigate("Info", {
+                //     id: data!.id,
+                //     type: isFile ? "file" : "folder",
+                //     data: data,
+                // });
+            },
+        },
+        {
+            title: "Permanently delete",
+            icon: (
+                <TrashIcon
+                    size={20}
+                    color={theme.colors.text}
+                />
+            ),
+        },
+    ];
+
     return (
         <BottomSheet
             ref={props.ref}
@@ -83,85 +181,17 @@ export default function ItemSheet(props: ItemSheetProps) {
                     <Text>{timestamp}</Text>
                 </View>
 
-                <ListItem
-                    title="Raname"
-                    icon={
-                        <PencilIcon
-                            size={20}
-                            color={theme.colors.text}
-                        />
-                    }
-                />
-                <ListItem
-                    title="Share"
-                    icon={
-                        <UserPlusIcon
-                            size={20}
-                            color={theme.colors.text}
-                        />
-                    }
-                />
-                <ListItem
-                    title="Manage access"
-                    icon={
-                        <UserGroupIcon
-                            size={20}
-                            color={theme.colors.text}
-                        />
-                    }
-                />
-                <ListItem
-                    title="Move"
-                    icon={
-                        <ArrowsPointingOutIcon
-                            size={20}
-                            color={theme.colors.text}
-                        />
-                    }
-                />
-                <ListItem
-                    title="Make available offline"
-                    icon={
-                        <CloudArrowDownIcon
-                            size={20}
-                            color={theme.colors.text}
-                        />
-                    }
-                />
-                <ListItem
-                    title="Download"
-                    icon={
-                        <ArrowDownTrayIcon
-                            size={20}
-                            color={theme.colors.text}
-                        />
-                    }
-                />
-                <ListItem
-                    title={`${isFile ? "File" : "Folder"} details`}
-                    icon={
-                        <ExclamationCircleIcon
-                            size={20}
-                            color={theme.colors.text}
-                        />
-                    }
-                    onTap={() => {
-                        // navigation.navigate("Info", {
-                        //     id: data!.id,
-                        //     type: isFile ? "file" : "folder",
-                        //     data: data,
-                        // });
-                    }}
-                />
-                <ListItem
-                    title="Permanetly delete"
-                    icon={
-                        <TrashIcon
-                            size={20}
-                            color={theme.colors.text}
-                        />
-                    }
-                />
+                {menuItems.map((item, index) => (
+                    <ListItem
+                        key={index}
+                        title={item.title}
+                        icon={item.icon}
+                        onTap={() => {
+                            close();
+                            item.onTap?.();
+                        }}
+                    />
+                ))}
             </BottomSheetView>
         </BottomSheet>
     );

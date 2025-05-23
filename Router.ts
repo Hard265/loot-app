@@ -22,7 +22,10 @@ type RootStackT = {
     ResetPassword: {
         email?: string;
     };
-    Share: undefined;
+    Share: {
+        type: "FileType" | "FolderType";
+        id: string;
+    };
 };
 
 const RootStack = createNativeStackNavigator({
