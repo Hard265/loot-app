@@ -11,7 +11,7 @@
     "graphql-compile": "graphql-codegen",
     "graphql-watch": "graphql-codegen -w",
     "prettier-watch": "onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}",
-    "postinstall": "node -e \"process.platform==='win32'?require('child_process').execSync('scripts\\\\postinstall.bat',{stdio:'inherit'}):require('child_process').execSync('sh scripts/postinstall.sh',{stdio:'inherit'})\""
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -26,6 +26,7 @@
     "expo": "~53.0.9",
     "expo-crypto": "~14.1.4",
     "expo-font": "~13.3.1",
+    "expo-linear-gradient": "~14.1.4",
     "expo-secure-store": "~14.2.3",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.7",
@@ -44,8 +45,7 @@
     "react-native-svg": "^15.11.2",
     "rxjs": "^7.8.2",
     "tailwindcss": "^3.4.17",
-    "use-debounce": "^10.0.4",
-    "expo-linear-gradient": "~14.1.4"
+    "use-debounce": "^10.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -61,6 +61,7 @@
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.0",
     "graphql": "^16.11.0",
+    "patch-package": "^8.0.0",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "typescript": "~5.8.3"

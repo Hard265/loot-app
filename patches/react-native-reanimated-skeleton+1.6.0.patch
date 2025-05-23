@@ -1,0 +1,41 @@
+diff --git a/node_modules/react-native-reanimated-skeleton/README.md b/node_modules/react-native-reanimated-skeleton/README.md
+index 68a7d6b..0ee8b09 100644
+--- a/node_modules/react-native-reanimated-skeleton/README.md
++++ b/node_modules/react-native-reanimated-skeleton/README.md
+@@ -87,10 +87,10 @@ export default function Placeholder () {
+ 
+ ### Expo install
+ 
+-`react-native-linear-gradient` is not supported with Expo. Therefore, a postinstall script is needed to change the import statement from `react-native-linear-gradient` to `expo-linear-gradient`. Furthermore, the postinstall script also addresses that `expo-linear-gradient` refers to `LinearGradient` as const instead of default. So the script will ensure:"
++`expo-linear-gradient` is not supported with Expo. Therefore, a postinstall script is needed to change the import statement from `expo-linear-gradient` to `expo-linear-gradient`. Furthermore, the postinstall script also addresses that `expo-linear-gradient` refers to `LinearGradient` as const instead of default. So the script will ensure:"
+ 
+ ```ts
+-import LinearGradient from 'react-native-linear-gradient';
++import { LinearGradient} from 'expo-linear-gradient';
+ 
+ ... transforms into ...
+ 
+diff --git a/node_modules/react-native-reanimated-skeleton/lib/module/ShiverBone.js b/node_modules/react-native-reanimated-skeleton/lib/module/ShiverBone.js
+index 552fbbf..f91cc0a 100644
+--- a/node_modules/react-native-reanimated-skeleton/lib/module/ShiverBone.js
++++ b/node_modules/react-native-reanimated-skeleton/lib/module/ShiverBone.js
+@@ -1,6 +1,6 @@
+ import React, { memo } from "react";
+ import { View, StyleSheet } from "react-native";
+-import LinearGradient from "react-native-linear-gradient";
++import { LinearGradient} from "expo-linear-gradient";
+ import Animated, { useAnimatedStyle } from "react-native-reanimated";
+ import { useGetGradientTransform } from "./worklets";
+ import { useGetBoneStyles } from "./hooks/useGetBoneStyles";
+diff --git a/node_modules/react-native-reanimated-skeleton/src/ShiverBone.tsx b/node_modules/react-native-reanimated-skeleton/src/ShiverBone.tsx
+index 7e6443c..3b33de1 100644
+--- a/node_modules/react-native-reanimated-skeleton/src/ShiverBone.tsx
++++ b/node_modules/react-native-reanimated-skeleton/src/ShiverBone.tsx
+@@ -1,6 +1,6 @@
+ import React, { memo } from "react";
+ import { View, StyleSheet } from "react-native";
+-import LinearGradient from "react-native-linear-gradient";
++import { LinearGradient} from "expo-linear-gradient";
+ import Animated, {
+   SharedValue,
+   useAnimatedStyle,
