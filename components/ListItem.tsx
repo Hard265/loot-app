@@ -28,7 +28,6 @@ export default function ListItem(props: {
     const theme = useTheme();
     const [title, setTitle] = useState(props.title);
     const disabled = !(props.onTap || props.onLongTap);
-    console.log(typeof props.onTap);
 
     return (
         <Animated.View
@@ -43,7 +42,7 @@ export default function ListItem(props: {
                 enabled={!disabled}
                 className="flex flex-row items-center gap-4 p-4 py-3"
             >
-                <View className="items-center justify-center w-6 h-6">
+                <View className="h-6 w-6 items-center justify-center">
                     {props.hasActivity && !props.icon ?
                         <ActivityIndicator
                             color={theme.colors.primary}
@@ -51,7 +50,7 @@ export default function ListItem(props: {
                         />
                     :   props.icon}
                 </View>
-                <View className="flex flex-col flex-1">
+                <View className="flex flex-1 flex-col">
                     <View>
                         {!props.editing ?
                             <Text variant="title3">{props.title}</Text>

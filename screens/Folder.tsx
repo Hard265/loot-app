@@ -1,5 +1,13 @@
+import {
+    GetFolderContentsDocument,
+    PutFileDocument,
+    PutFolderDocument,
+} from "@/__generated__/schema/graphql";
 import Text from "@/components/Text";
+import FolderListItem from "@/components/ui/FolderListItem";
+import ListDisplayHeader from "@/components/ui/ListDisplayHeader";
 import { RootStackT } from "@/Router";
+import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
 import { useMutation, useQuery } from "@apollo/client";
 import {
     RouteProp,
@@ -14,15 +22,12 @@ import {
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
-    Pressable,
+    RefreshControl,
     TextProps,
     View,
-    RefreshControl,
 } from "react-native";
-import {
-    ArrowDownIcon,
-    MagnifyingGlassIcon,
-} from "react-native-heroicons/outline";
+import { RectButton } from "react-native-gesture-handler";
+import { MagnifyingGlassIcon } from "react-native-heroicons/outline";
 import Animated, {
     Extrapolation,
     FadeIn,
@@ -33,14 +38,6 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
 } from "react-native-reanimated";
-import { RectButton } from "react-native-gesture-handler";
-import {
-    GetFolderContentsDocument,
-    PutFileDocument,
-    PutFolderDocument,
-} from "@/__generated__/schema/graphql";
-import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
-import FolderListItem from "@/components/ui/FolderListItem";
 
 const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
     props,
@@ -54,31 +51,6 @@ const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
                 {props.children}
             </Animated.Text>
         </View>
-    );
-};
-
-const ListHeader: FC<{ title: string }> = (props) => {
-    return (
-        <View className="flex flex-col w-ful">
-            <View className="flex items-center justify-center pt-4 pb-2">
-                <Text variant="largeTitle">{props.title}</Text>
-            </View>
-            <SortMenu />
-        </View>
-    );
-};
-
-const SortMenu = () => {
-    const { colors } = useTheme();
-
-    return (
-        <Pressable className="flex-row items-center p-4 gap-2 bg-background">
-            <Text variant="title3">Name</Text>
-            <ArrowDownIcon
-                size={16}
-                color={colors.text}
-            />
-        </Pressable>
     );
 };
 
@@ -198,7 +170,14 @@ export default function Folder() {
             keyExtractor={({ id }) => id}
             // stickyHeaderIndices={[0]}
             ListHeaderComponent={
-                <ListHeader title={data?.folderById?.name || ""} />
+                <View className="w-ful flex flex-col">
+                    <View className="flex items-center justify-center pb-2 pt-4">
+                        <Text variant="largeTitle">
+                            {data?.folderById?.name}
+                        </Text>
+                    </View>
+                    {!loading && <ListDisplayHeader />}
+                </View>
             }
             ListFooterComponent={
                 loading ?

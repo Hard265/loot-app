@@ -45,7 +45,7 @@ cssInterop(BottomSheet, {
 export default function ItemSheet(props: ItemSheetProps) {
     const theme = useTheme();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackT>>();
-    const { data, hideContext } = useItemContext();
+    const { data } = useItemContext();
     const [isShown, setIsShown] = useState(false);
 
     const handleSheetChange = (index: number) => {
@@ -103,6 +103,11 @@ export default function ItemSheet(props: ItemSheetProps) {
                     color={theme.colors.text}
                 />
             ),
+            onTap() {
+                navigation.navigate("ShareManage", {
+                    id: data?.id!,
+                });
+            },
         },
         {
             title: "Move",

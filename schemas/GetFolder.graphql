@@ -1,0 +1,24 @@
+query GetFolder($id: UUID!) {
+    folderById(id: $id) {
+        id
+        name
+        hasShares
+        hasShareLinks
+        createdAt
+        shares {
+            id
+            expiresAt
+            isActive
+            permission
+            sharedAt
+        }
+        shareLinks {
+            createdAt
+            downloadCount
+            expiresAt
+            id
+            isActive
+            permission
+        }
+    }
+}

@@ -1,81 +1,45 @@
-import { useNavigation, useTheme } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable } from "react-native";
 import {
-    ArrowDownIcon,
-    CalendarDaysIcon,
-} from "react-native-heroicons/outline";
+    GetRootContentsDocument,
+    PutFileDocument,
+    PutFolderDocument,
+} from "@/__generated__/schema/graphql";
+import FolderListItem from "@/components/ui/FolderListItem";
+import ListDisplayHeader from "@/components/ui/ListDisplayHeader";
+import { RootStackT } from "@/Router";
+import rootStore from "@/stores";
+import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
+import { getGravatarUri } from "@/utils";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+    useFocusEffect,
+    useNavigation,
+    useTheme,
+} from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { cssInterop } from "nativewind";
+import React, { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native";
+import { RectButton } from "react-native-gesture-handler";
 import Animated, {
     FadeIn,
     FadeOut,
     LinearTransition,
 } from "react-native-reanimated";
-import { observer } from "mobx-react-lite";
-import Text from "@/components/Text";
-import Avatar from "@/components/Avatar";
-import { RootStackT } from "@/Router";
-import { getGravatarUri } from "@/utils";
-import { useMutation, useQuery } from "@apollo/client";
-import { RectButton } from "react-native-gesture-handler";
-import {
-    GetRootContentsDocument,
-    PutFolderDocument,
-    PutFileDocument,
-} from "@/__generated__/schema/graphql";
-import FolderListItem from "@/components/ui/FolderListItem";
-import rootStore from "@/stores";
-import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
-import { showOptions } from "@/layouts/OptionsManagerLayout";
+import Skeleton from "react-native-reanimated-skeleton";
+import colors from "tailwindcss/colors";
 
 type NavigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
-const SortMenu = () => {
-    const { colors } = useTheme();
-
-    return (
-        <>
-            <Pressable
-                onPress={() => {
-                    showOptions([
-                        {
-                            label: "Size",
-                            value: "size",
-                            icon: (
-                                <CalendarDaysIcon
-                                    size={24}
-                                    color={colors.text}
-                                />
-                            ),
-                        },
-                        {
-                            label: "Date Modified",
-                            value: "dateModified",
-                            icon: (
-                                <CalendarDaysIcon
-                                    size={24}
-                                    color={colors.text}
-                                />
-                            ),
-                        },
-                    ]);
-                }}
-                className="flex-row items-center p-4 gap-2 bg-background"
-            >
-                <Text variant="title3">Name</Text>
-                <ArrowDownIcon
-                    size={16}
-                    color={colors.text}
-                />
-            </Pressable>
-        </>
-    );
-};
+cssInterop(Skeleton, {
+    className: "containerStyle",
+});
 
 function Home() {
     const theme = useTheme();
     const navigation = useNavigation<NavigationProp>();
     const [userImage, setUserImage] = useState("");
+    const [userImageLoading, setUserImageLoading] = useState(false);
+
     const { data, loading, refetch } = useQuery(GetRootContentsDocument);
     const [refetching, setRefetching] = useState(false);
 
@@ -86,13 +50,19 @@ function Home() {
         new Set(),
     );
 
-    useEffect(() => {
-        (async () => {
-            setUserImage(
-                await getGravatarUri(rootStore.authStore.user?.email!, 80),
-            );
-        })();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            (async () => {
+                setUserImageLoading(true);
+                const imgUrl = await getGravatarUri(
+                    rootStore.authStore.user?.email!,
+                    200,
+                );
+                setUserImage(imgUrl);
+                setUserImageLoading(false);
+            })();
+        }, []),
+    );
 
     useEffect(() => {
         navigation.setOptions({
@@ -104,12 +74,39 @@ function Home() {
                             navigation.navigate("User");
                         }}
                     >
-                        <Avatar uri={userImage} />
+                        <Skeleton
+                            // @ts-ignore
+                            className="size-12"
+                            isLoading={userImageLoading}
+                            highlightColor={
+                                theme.dark ?
+                                    colors.neutral[700]
+                                :   colors.neutral[300]
+                            }
+                            boneColor={
+                                theme.dark ?
+                                    colors.neutral[900]
+                                :   colors.neutral[200]
+                            }
+                            layout={[
+                                {
+                                    height: "100%",
+                                    width: "100%",
+                                },
+                            ]}
+                        >
+                            {userImage && (
+                                <Animated.Image
+                                    className="h-full w-full"
+                                    source={{ uri: userImage }}
+                                />
+                            )}
+                        </Skeleton>
                     </RectButton>
                 );
             },
         });
-    }, [navigation, userImage]);
+    }, [navigation, theme.dark, userImage, userImageLoading]);
 
     useEffect(() => {
         const subscriber = ongoingOpsStore
@@ -176,7 +173,7 @@ function Home() {
                     </Animated.View>
                 :   null
             }
-            ListHeaderComponent={<SortMenu />}
+            ListHeaderComponent={loading ? undefined : <ListDisplayHeader />}
         />
     );
 }

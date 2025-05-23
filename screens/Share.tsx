@@ -1,7 +1,11 @@
-import { GetFileDocument } from "@/__generated__/schema/graphql";
+import {
+    GetFileDocument,
+    GetFolderDocument,
+} from "@/__generated__/schema/graphql";
 import ListItem from "@/components/ListItem";
 import Text from "@/components/Text";
 import { Option, showOptions } from "@/layouts/OptionsManagerLayout";
+import { shareScreenSubject$ } from "@/layouts/ShareScreenLayout";
 import { RootStackT } from "@/Router";
 import { useLazyQuery } from "@apollo/client";
 import {
@@ -14,20 +18,17 @@ import {
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { cssInterop } from "nativewind";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, ScrollView, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import {
+    AdjustmentsHorizontalIcon,
     EyeIcon,
     PencilIcon,
     ShieldCheckIcon,
     UserPlusIcon,
     XMarkIcon,
-    AdjustmentsHorizontalIcon,
-    CalendarDaysIcon,
-    BellAlertIcon,
-    CheckIcon,
 } from "react-native-heroicons/outline";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Skeleton from "react-native-reanimated-skeleton";
 import colors from "tailwindcss/colors";
 
 type routeProp = RouteProp<RootStackT, "Share">;
@@ -37,16 +38,23 @@ type permissions = "view" | "edit" | "manage";
 cssInterop(RectButton, {
     className: "style",
 });
+cssInterop(Skeleton, {
+    className: "containerStyle",
+});
 
 export default function Share() {
     const theme = useTheme();
     const route = useRoute<routeProp>();
     const navigation = useNavigation<navigationProp>();
     const [shareWith, setShareWith] = useState<string[]>([]);
-
     const [permission, setPermission] = useState<permissions>("view");
 
-    const [queryFile, { loading, data }] = useLazyQuery(GetFileDocument, {
+    const [queryFileById, { loading, data }] = useLazyQuery(GetFileDocument, {
+        variables: {
+            id: route.params.id,
+        },
+    });
+    const [queryFolderById] = useLazyQuery(GetFolderDocument, {
         variables: {
             id: route.params.id,
         },
@@ -56,15 +64,18 @@ export default function Share() {
         useCallback(() => {
             switch (route.params.type) {
                 case "FileType":
-                    queryFile();
+                    queryFileById();
+                    break;
+                case "FolderType":
+                    queryFolderById();
                     break;
             }
-        }, [queryFile, route.params.type]),
+        }, [queryFileById, queryFolderById, route.params.type]),
     );
 
     useEffect(() => {
         navigation.setOptions({
-            headerRight(props) {
+            headerRight() {
                 return (
                     <RectButton>
                         <Text
@@ -78,6 +89,13 @@ export default function Share() {
             },
         });
     });
+
+    useEffect(() => {
+        const subscriber = shareScreenSubject$.subscribe(() => {
+            console.log("fired");
+        });
+        return subscriber.unsubscribe;
+    }, []);
 
     const permissionOptions: Option<permissions>[] = useMemo(
         () => [
@@ -116,118 +134,124 @@ export default function Share() {
     );
 
     return (
-        <>
-            <ScrollView>
-                <View className="flex flex-row items-center border-b border-text/25">
-                    <View className="p-4">
-                        <UserPlusIcon
-                            size={24}
-                            color={theme.colors.text}
-                        />
-                    </View>
-                    <View className="flex flex-1">
-                        <TextInput
-                            className="ml-1.5 p-4 font-[MontrealRegular] text-lg text-text placeholder-red-700 caret-primary"
-                            placeholder="Share with (email address)"
-                            placeholderTextColor={colors.neutral[500]}
-                            autoFocus
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            autoComplete="email"
-                        />
-                    </View>
+        <View>
+            <View className="flex flex-row items-center border-b border-text/25">
+                <View className="p-4">
+                    <UserPlusIcon
+                        size={24}
+                        color={theme.colors.text}
+                    />
                 </View>
-                {loading ?
-                    <Animated.View
-                        entering={FadeIn}
-                        exiting={FadeOut}
-                        className="items-center justify-center flex-1 p-8"
-                    >
-                        <ActivityIndicator
-                            size="large"
-                            color={theme.colors.primary}
-                        />
-                    </Animated.View>
-                :   <View>
-                        <View className="flex flex-row flex-wrap items-start p-4">
-                            {data?.fileById?.shares.map((item) => {
-                                return (
-                                    <RectButton
-                                        key={item.id}
-                                        className="p-1 px-2 bg-primary/25"
-                                    >
-                                        <Text variant="footnote">
-                                            {item.sharedWith.email}
-                                        </Text>
-                                    </RectButton>
-                                );
-                            })}
-                            {shareWith.map((email, index) => {
-                                return (
-                                    <Animated.View key={`${index}-share-item`}>
-                                        <RectButton className="flex flex-row items-center gap-2 bg-primary/25 px-2.5 py-1.5">
-                                            <Text
-                                                variant="label"
-                                                color="primary"
-                                            >
-                                                {email}
-                                            </Text>
-                                            <XMarkIcon
-                                                size={16}
-                                                color={theme.colors.primary}
-                                            />
-                                        </RectButton>
-                                    </Animated.View>
-                                );
-                            })}
-                        </View>
-                    </View>
+                <View className="flex flex-1">
+                    <TextInput
+                        className="ml-1.5 p-4 font-[MontrealRegular] text-lg text-text placeholder-red-700 caret-primary"
+                        placeholder="Share with (email address)"
+                        placeholderTextColor={colors.neutral[500]}
+                        autoFocus
+                        onSubmitEditing={(e) => {
+                            setShareWith((shares) =>
+                                Array.from(
+                                    new Set(shares).add(e.nativeEvent.text),
+                                ),
+                            );
+                        }}
+                        submitBehavior="submit"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        autoComplete="email"
+                    />
+                </View>
+            </View>
+            <Skeleton
+                isLoading={loading}
+                animationType="shiver"
+                //@ts-ignore
+                className="m-4 h-auto"
+                highlightColor={
+                    theme.dark ? colors.neutral[700] : colors.neutral[300]
                 }
-                <View>
-                    <View>
-                        <ListItem
-                            icon={
-                                <ShieldCheckIcon
-                                    size={24}
-                                    color={theme.colors.text}
+                boneColor={
+                    theme.dark ? colors.neutral[900] : colors.neutral[200]
+                }
+                layout={[
+                    {
+                        width: "100%",
+                        key: Math.random().toString(16),
+                        flexDirection: "row",
+                        gap: 8,
+                        height: 28,
+                        alignItems: "center",
+                        children: [
+                            {
+                                key: Math.random().toString(16),
+                                height: "100%",
+                                width: "40%",
+                            },
+                            {
+                                key: Math.random().toString(16),
+                                height: "100%",
+
+                                width: "40%",
+                            },
+                        ],
+                    },
+                ]}
+            >
+                <View className="flex flex-row flex-wrap items-start">
+                    {data?.fileById?.shares.map((item) => {
+                        return (
+                            <RectButton
+                                key={item.id}
+                                //@ts-ignore
+                                className="bg-primary/25 p-1 px-2"
+                            >
+                                <Text variant="footnote">
+                                    {item.sharedWith.email}
+                                </Text>
+                            </RectButton>
+                        );
+                    })}
+                    {shareWith.map((email, index) => {
+                        return (
+                            <RectButton
+                                key={`${index}-share-item`}
+                                //@ts-ignore
+                                className="flex flex-row items-center gap-2 bg-primary/25 px-2.5 py-1.5"
+                            >
+                                <Text
+                                    variant="label"
+                                    color="primary"
+                                >
+                                    {email}
+                                </Text>
+                                <XMarkIcon
+                                    size={16}
+                                    color={theme.colors.primary}
                                 />
-                            }
-                            onTap={() => {
-                                showOptions(permissionOptions).then((value) => {
-                                    if (value) setPermission(value);
-                                });
-                            }}
-                            title="Permission"
-                            subtitle={`Can ${permission}`}
-                        />
-                        <ListItem
-                            icon={
-                                <CalendarDaysIcon
-                                    size={24}
-                                    color={theme.colors.text}
-                                />
-                            }
-                            title="Time-Limited access"
-                            subtitle="Not set"
-                        />
-                        <ListItem
-                            icon={
-                                <BellAlertIcon
-                                    size={24}
-                                    color={theme.colors.text}
-                                />
-                            }
-                            title="Notify on access"
-                        />
-                    </View>
+                            </RectButton>
+                        );
+                    })}
                 </View>
-            </ScrollView>
-            <RectButton className="absolute bottom-8 right-4 items-center justify-center p-5 bg-primary shadow-sm shadow-text">
-                <CheckIcon
-                    size={24}
-                    color={colors.white}
-                />
-            </RectButton>
-        </>
+            </Skeleton>
+            <View>
+                <View>
+                    <ListItem
+                        icon={
+                            <ShieldCheckIcon
+                                size={24}
+                                color={theme.colors.text}
+                            />
+                        }
+                        onTap={() => {
+                            showOptions(permissionOptions).then((value) => {
+                                if (value) setPermission(value);
+                            });
+                        }}
+                        title="Permission"
+                        subtitle={`Can ${permission}`}
+                    />
+                </View>
+            </View>
+        </View>
     );
 }

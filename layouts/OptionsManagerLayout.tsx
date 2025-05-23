@@ -107,6 +107,7 @@ const OptionsManagerLayout: FC<PropsWithChildren> = ({ children }) => {
                 backdropComponent={renderBackdrop}
                 onClose={hideOptions}
                 onChange={handleOnBottomSheetChange}
+                //@ts-ignore
                 className="rounded-none bg-secondary"
                 handleIndicatorClassName="bg-text"
             >

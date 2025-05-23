@@ -19,6 +19,7 @@ export default function App() {
     const colorScheme = useColorScheme();
     const [fontsLoaded, fontsErr] = useFonts({
         RoobertBold: require("./assets/fonts/Roobert-Bold.otf"),
+        RoobertMedium: require("./assets/fonts/Roobert-Medium.otf"),
         MontrealRegular: require("./assets/fonts/NeueMontreal-Regular.otf"),
         MontrealMedium: require("./assets/fonts/NeueMontreal-Medium.otf"),
     });

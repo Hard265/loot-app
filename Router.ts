@@ -12,12 +12,16 @@ import ShareScreen from "./screens/Share";
 import SignIn from "./screens/SignIn";
 import User from "./screens/User";
 import SignedOutHeaderRight from "./components/ui/SignedOutHeaderRight";
+import ShareManage from "./screens/ShareManage";
+import ShareScreenLayout from "./layouts/ShareScreenLayout";
+import { UserSettings } from "./screens/UserSettings";
 
 type RootStackT = {
     SignIn: undefined;
     Home: undefined;
     Folder: { id: string };
     User: undefined;
+    UserSettings: undefined;
     Register: undefined;
     ResetPassword: {
         email?: string;
@@ -26,9 +30,17 @@ type RootStackT = {
         type: "FileType" | "FolderType";
         id: string;
     };
+    ShareManage: {
+        id: string;
+    };
 };
 
 const RootStack = createNativeStackNavigator({
+    screenOptions: {
+        headerTitleStyle: {
+            fontFamily: "RoobertMedium",
+        },
+    },
     groups: {
         SignedOut: {
             if: useIsSignedOut,
@@ -50,7 +62,20 @@ const RootStack = createNativeStackNavigator({
                 Home: Home,
                 Folder: Folder,
                 User: User,
-                Share: ShareScreen,
+                UserSettings: {
+                    screen: UserSettings,
+                    options: { title: "Account settings" },
+                },
+                Share: {
+                    screen: ShareScreen,
+                    layout(props) {
+                        return ShareScreenLayout({ children: props.children });
+                    },
+                },
+                Manage: {
+                    screen: ShareManage,
+                    options: { title: "Manage access" },
+                },
             },
             screenOptions: {
                 headerShadowVisible: false,
@@ -58,10 +83,13 @@ const RootStack = createNativeStackNavigator({
             },
         },
     },
-    layout: (props) =>
-        OptionsManagerLayout({
+    //@ts-ignore
+    layout: (props) => {
+        return OptionsManagerLayout({
+            //@ts-ignore
             children: ItemContextLayout({ children: PlusFabLayout(props) }),
-        }),
+        });
+    },
 });
 
 const Navigation = createStaticNavigation(RootStack);
