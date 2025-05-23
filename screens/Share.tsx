@@ -49,16 +49,18 @@ export default function Share() {
     const [shareWith, setShareWith] = useState<string[]>([]);
     const [permission, setPermission] = useState<permissions>("view");
 
-    const [queryFileById, { loading, data }] = useLazyQuery(GetFileDocument, {
-        variables: {
-            id: route.params.id,
-        },
-    });
-    const [queryFolderById] = useLazyQuery(GetFolderDocument, {
-        variables: {
-            id: route.params.id,
-        },
-    });
+    const [queryFileById, { loading: loadingFile, data: dataFile }] =
+        useLazyQuery(GetFileDocument, {
+            variables: {
+                id: route.params.id,
+            },
+        });
+    const [queryFolderById, { loading: loadingFolder, data: dataFolder }] =
+        useLazyQuery(GetFolderDocument, {
+            variables: {
+                id: route.params.id,
+            },
+        });
 
     useFocusEffect(
         useCallback(() => {
@@ -133,6 +135,21 @@ export default function Share() {
         [theme.colors.text],
     );
 
+    const sharesData = useMemo(() => {
+        if (route.params.type === "FileType") {
+            return {
+                loading: loadingFile,
+                shares: dataFile?.fileById?.shares ?? [],
+            };
+        } else if (route.params.type === "FolderType") {
+            return {
+                loading: loadingFolder,
+                shares: dataFolder?.folderById?.shares ?? [],
+            };
+        }
+        return { loading: false, shares: [] };
+    }, [route.params.type, loadingFile, loadingFolder, dataFile, dataFolder]);
+
     return (
         <View>
             <View className="flex flex-row items-center border-b border-text/25">
@@ -163,7 +180,7 @@ export default function Share() {
                 </View>
             </View>
             <Skeleton
-                isLoading={loading}
+                isLoading={sharesData.loading}
                 animationType="shiver"
                 //@ts-ignore
                 className="m-4 h-auto"
@@ -198,7 +215,7 @@ export default function Share() {
                 ]}
             >
                 <View className="flex flex-row flex-wrap items-start">
-                    {data?.fileById?.shares.map((item) => {
+                    {sharesData.shares.map((item) => {
                         return (
                             <RectButton
                                 key={item.id}

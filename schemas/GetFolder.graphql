@@ -11,6 +11,10 @@ query GetFolder($id: UUID!) {
             isActive
             permission
             sharedAt
+            sharedWith {
+                id
+                email
+            }
         }
         shareLinks {
             createdAt
