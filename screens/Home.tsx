@@ -1,4 +1,6 @@
 import {
+    FileType,
+    FolderType,
     GetRootContentsDocument,
     PutFileDocument,
     PutFolderDocument,
@@ -55,28 +57,33 @@ function Home() {
         refetch().finally(() => setRefetching(false));
     };
 
-    // const handleSubmitRename = (
-    //     id: unknown,
-    //     name: string,
-    //     type?: "FileType" | "FolderType",
-    // ) => {
-    //     ongoingOpsStore.trackOperation("update", id as string);
-    //     switch (type) {
-    //         case "FileType":
-    //             updateFile({ variables: { id, name } });
-    //             break;
-    //         case "FolderType":
-    //             updateFolder({ variables: { id, name } });
-    //             break;
-    //     }
-    // };
+    const handleUpdateName = (
+        data: Pick<FileType | FolderType, "id" | "__typename" | "name">,
+    ) => {
+        ongoingOpsStore.trackOperation("update", data.id as string);
+        switch (data.__typename) {
+            case "FileType":
+                updateFile({ variables: { id: data.id, name: data.name } });
+                break;
+            case "FolderType":
+                updateFolder({ variables: { id: data.id, name: data.name } });
+                break;
+        }
+    };
+
+    const list = [data?.contents!].flat().filter((item) => item !== null) as (
+        | FileType
+        | FolderType
+    )[];
 
     return (
         <List
-            data={[data?.contents].flat()}
+            data={list}
             onRefresh={handleRefetch}
             refreshing={refetching}
             isLoading={loading}
+            onUpdate={handleUpdateName}
+            operations={ongoingOperations}
         />
     );
 }

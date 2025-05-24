@@ -23,6 +23,8 @@ import Animated from "react-native-reanimated";
 import ListItem from "../ListItem";
 import ListItemSkeleton from "../ListItemSkeleton";
 import ListDisplayHeader from "./ListDisplayHeader";
+import {NativeSyntheticEvent} from "react-native";
+import {NativeScrollEvent} from "react-native";
 
 type navigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
@@ -34,7 +36,8 @@ interface ListProps {
     onUpdate?(
         updates: Pick<FileType | FolderType, "id" | "__typename" | "name">,
     ): void;
-    operations?: string[];
+    operations?: Set<string>;
+    onScroll?(event: NativeSyntheticEvent<NativeScrollEvent>): void;
 }
 
 export default function List(props: ListProps) {
@@ -43,6 +46,7 @@ export default function List(props: ListProps) {
     const [editingId, setEditingId] = useState<string>("");
 
     const renderItem = ({ item }: { item: FolderType | FileType }) => {
+        const hasActivity = props.operations?.has(item.id);
         const timestamp = dayjs(item.createdAt).format("MMM DD, YY");
         return item.__typename === "FileType" ?
                 <ListItem
@@ -70,6 +74,16 @@ export default function List(props: ListProps) {
                                 break;
                         }
                     }}
+                    onSubmit={(name) => {
+                        setEditingId('');
+                        if (name.trim() === "") return;
+                        props.onUpdate?.({
+                            __typename: item.__typename,
+                            id: item.id,
+                            name:name.trim(),
+                        });
+                    }}
+                    hasActivity={hasActivity}
                 />
             :   <ListItem
                     title={item.name}
@@ -95,12 +109,15 @@ export default function List(props: ListProps) {
                         });
                     }}
                     onSubmit={(name) => {
+                        setEditingId('');
+                        if (name.trim() === "") return;
                         props.onUpdate?.({
-                            id: item.id,
                             __typename: item.__typename,
-                            name,
+                            id: item.id,
+                            name:name.trim(),
                         });
                     }}
+                    hasActivity={hasActivity}
                 />;
     };
     return (
@@ -108,6 +125,7 @@ export default function List(props: ListProps) {
             data={props.data.filter(Boolean)}
             renderItem={renderItem}
             keyExtractor={({ id }) => id}
+            onScroll={props.onScroll}
             refreshControl={
                 <RefreshControl
                     refreshing={!!props.refreshing}

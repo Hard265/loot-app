@@ -1,39 +1,26 @@
 import {
+    FileType,
+    FolderType,
     GetFolderContentsDocument,
     PutFileDocument,
     PutFolderDocument,
 } from "@/__generated__/schema/graphql";
-import Text from "@/components/Text";
-import FolderListItem from "@/components/ui/FolderListItem";
-import ListDisplayHeader from "@/components/ui/ListDisplayHeader";
+import List from "@/components/ui/List";
 import { RootStackT } from "@/Router";
 import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
 import { useMutation, useQuery } from "@apollo/client";
-import {
-    RouteProp,
-    useNavigation,
-    useRoute,
-    useTheme,
-} from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import {
     NativeStackHeaderRightProps,
     NativeStackNavigationProp,
 } from "@react-navigation/native-stack";
-import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
-import {
-    ActivityIndicator,
-    RefreshControl,
-    TextProps,
-    View,
-} from "react-native";
+import { FC, PropsWithChildren, useEffect, useState } from "react";
+import { TextProps, View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { MagnifyingGlassIcon } from "react-native-heroicons/outline";
 import Animated, {
     Extrapolation,
-    FadeIn,
-    FadeOut,
     interpolate,
-    LinearTransition,
     useAnimatedScrollHandler,
     useAnimatedStyle,
     useSharedValue,
@@ -55,7 +42,6 @@ const HeaderTitle: FC<PropsWithChildren<{ style: TextProps["style"] }>> = (
 };
 
 export default function Folder() {
-    const theme = useTheme();
     const route = useRoute<RouteProp<RootStackT, "Folder">>();
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackT, "Folder">>();
@@ -68,7 +54,7 @@ export default function Folder() {
             id: route.params.id,
         },
     });
-    const [refreshing, setRefreshing] = useState(false);
+    const [refetching, setRefetching] = useState(false);
     const [updateFile] = useMutation(PutFileDocument);
     const [updateFolder] = useMutation(PutFolderDocument);
     const [ongoingOperations, setOngoingOperations] = useState<Set<string>>(
@@ -98,7 +84,7 @@ export default function Folder() {
         return subscriber.unsubscribe;
     }, []);
 
-    const scrollHandler = useAnimatedScrollHandler({
+    const reanimatedScrollHandler = useAnimatedScrollHandler({
         onScroll(e) {
             titleOffset.value = interpolate(
                 e.contentOffset.y,
@@ -109,91 +95,39 @@ export default function Folder() {
         },
     });
 
-    const onRefresh = useCallback(async () => {
-        setRefreshing(true);
-        try {
-            await refetch();
-        } finally {
-            setRefreshing(false);
-        }
-    }, [refetch]);
+    const handleRefetch = () => {
+        setRefetching(true);
+        refetch().finally(() => setRefetching(false));
+    };
 
-    const list = (data?.contents ?? []).filter(
-        (item): item is NonNullable<typeof item> => item !== null,
-    );
-
-    const handleSubmit = (
-        id: string,
-        name: string,
-        type: "FileType" | "FolderType",
-    ): void => {
-        ongoingOpsStore.trackOperation("update", id);
-        switch (type) {
+    const handleUpdateName = (
+        data: Pick<FileType | FolderType, "id" | "__typename" | "name">,
+    ) => {
+        ongoingOpsStore.trackOperation("update", data.id as string);
+        switch (data.__typename) {
             case "FileType":
-                updateFile({
-                    variables: {
-                        id,
-                        name,
-                    },
-                });
+                updateFile({ variables: { id: data.id, name: data.name } });
                 break;
             case "FolderType":
-                updateFolder({
-                    variables: { id, name },
-                });
+                updateFolder({ variables: { id: data.id, name: data.name } });
                 break;
         }
     };
+
+    const list = [data?.contents!].flat().filter((item) => item !== null) as (
+        | FileType
+        | FolderType
+    )[];
+
     return (
-        <Animated.FlatList
+        <List
             data={list}
-            renderItem={({ item }) =>
-                item && (
-                    <FolderListItem
-                        item={item}
-                        hasActiveOperation={ongoingOperations.has(item.id)}
-                        onSubmitEditing={(name) =>
-                            handleSubmit(item.id, name, item.__typename!)
-                        }
-                    />
-                )
-            }
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    tintColor={theme.colors.primary}
-                    progressBackgroundColor={theme.colors.background}
-                    onRefresh={onRefresh}
-                />
-            }
-            onScroll={scrollHandler}
-            keyExtractor={({ id }) => id}
-            // stickyHeaderIndices={[0]}
-            ListHeaderComponent={
-                <View className="w-ful flex flex-col">
-                    <View className="flex items-center justify-center pb-2 pt-4">
-                        <Text variant="largeTitle">
-                            {data?.folderById?.name}
-                        </Text>
-                    </View>
-                    {!loading && <ListDisplayHeader />}
-                </View>
-            }
-            ListFooterComponent={
-                loading ?
-                    <Animated.View
-                        entering={FadeIn}
-                        exiting={FadeOut}
-                        layout={LinearTransition}
-                        className="items-center justify-center p-4"
-                    >
-                        <ActivityIndicator
-                            size="large"
-                            color={theme.colors.primary}
-                        />
-                    </Animated.View>
-                :   null
-            }
+            onRefresh={handleRefetch}
+            refreshing={refetching}
+            isLoading={loading}
+            onUpdate={handleUpdateName}
+            operations={ongoingOperations}
+            onScroll={reanimatedScrollHandler}
         />
     );
 }
