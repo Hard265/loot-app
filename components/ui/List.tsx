@@ -6,7 +6,11 @@ import { Theme, useNavigation, useTheme } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import dayjs from "dayjs";
 import { ReactNode, useState } from "react";
-import { RefreshControl } from "react-native";
+import {
+    RefreshControl,
+    NativeSyntheticEvent,
+    NativeScrollEvent,
+} from "react-native";
 import {
     ArrowDownTrayIcon,
     ArrowsPointingOutIcon,
@@ -23,8 +27,6 @@ import Animated from "react-native-reanimated";
 import ListItem from "../ListItem";
 import ListItemSkeleton from "../ListItemSkeleton";
 import ListDisplayHeader from "./ListDisplayHeader";
-import { NativeSyntheticEvent } from "react-native";
-import { NativeScrollEvent } from "react-native";
 
 type navigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
@@ -142,12 +144,14 @@ export default function List(props: ListProps) {
                     onRefresh={props.onRefresh}
                 />
             }
-            ListHeaderComponent={<ListDisplayHeader />}
-            ListFooterComponent={
+            ListHeaderComponent={
                 <>
                     {props.header}
-                    <ListItemSkeleton isLoading={!!props.isLoading} />
+                    <ListDisplayHeader />
                 </>
+            }
+            ListFooterComponent={
+                <ListItemSkeleton isLoading={!!props.isLoading} />
             }
         />
     );

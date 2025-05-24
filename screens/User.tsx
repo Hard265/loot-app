@@ -140,38 +140,41 @@ export default function User() {
                     }
                     subtitle={colorScheme}
                     onTap={() =>
-                        showOptions<ColorSchemeName>([
-                            {
-                                label: "Light",
-                                value: "light",
-                                icon: (
-                                    <SunIcon
-                                        size={20}
-                                        color={theme.colors.text}
-                                    />
-                                ),
-                            },
-                            {
-                                label: "Dark",
-                                value: "dark",
-                                icon: (
-                                    <MoonIcon
-                                        size={20}
-                                        color={theme.colors.text}
-                                    />
-                                ),
-                            },
-                            {
-                                label: "System",
-                                value: "system",
-                                icon: (
-                                    <DevicePhoneMobileIcon
-                                        size={20}
-                                        color={theme.colors.text}
-                                    />
-                                ),
-                            },
-                        ]).then((scheme) => {
+                        showOptions<ColorSchemeName>(
+                            [
+                                {
+                                    label: "Light",
+                                    value: "light",
+                                    icon: (
+                                        <SunIcon
+                                            size={20}
+                                            color={theme.colors.text}
+                                        />
+                                    ),
+                                },
+                                {
+                                    label: "Dark",
+                                    value: "dark",
+                                    icon: (
+                                        <MoonIcon
+                                            size={20}
+                                            color={theme.colors.text}
+                                        />
+                                    ),
+                                },
+                                {
+                                    label: "System",
+                                    value: "system",
+                                    icon: (
+                                        <DevicePhoneMobileIcon
+                                            size={20}
+                                            color={theme.colors.text}
+                                        />
+                                    ),
+                                },
+                            ],
+                            { selected: colorScheme },
+                        ).then((scheme) => {
                             if (scheme) setColorScheme(scheme);
                         })
                     }

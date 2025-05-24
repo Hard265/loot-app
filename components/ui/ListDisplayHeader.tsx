@@ -76,28 +76,31 @@ export default function ListDisplayHeader() {
             </Pressable>
             <Pressable
                 onPress={() => {
-                    showOptions([
-                        {
-                            label: "Grid",
-                            value: "grid",
-                            icon: (
-                                <Squares2X2Icon
-                                    size={20}
-                                    color={colors.text}
-                                />
-                            ),
-                        },
-                        {
-                            label: "List",
-                            value: "list",
-                            icon: (
-                                <ListBulletIcon
-                                    size={20}
-                                    color={colors.text}
-                                />
-                            ),
-                        },
-                    ]);
+                    showOptions(
+                        [
+                            {
+                                label: "Grid",
+                                value: "grid",
+                                icon: (
+                                    <Squares2X2Icon
+                                        size={20}
+                                        color={colors.text}
+                                    />
+                                ),
+                            },
+                            {
+                                label: "List",
+                                value: "list",
+                                icon: (
+                                    <ListBulletIcon
+                                        size={20}
+                                        color={colors.text}
+                                    />
+                                ),
+                            },
+                        ],
+                        { selected: "list" },
+                    );
                 }}
             >
                 <Squares2X2Icon
