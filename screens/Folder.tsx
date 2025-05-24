@@ -5,6 +5,7 @@ import {
     PutFileDocument,
     PutFolderDocument,
 } from "@/__generated__/schema/graphql";
+import Text from "@/components/Text";
 import List from "@/components/ui/List";
 import { RootStackT } from "@/Router";
 import { ongoingOpsStore } from "@/stores/OngoingOperationsStore";
@@ -63,7 +64,7 @@ export default function Folder() {
 
     useEffect(() => {
         navigation.setOptions({
-            title: data?.folderById?.name || "",
+            title: route.params.name || data?.folderById?.name || "",
             headerTitle({ children }) {
                 return (
                     <HeaderTitle style={titleOffsetStyle}>
@@ -73,7 +74,7 @@ export default function Folder() {
             },
             headerRight: (props) => <HeaderRight {...props} />,
         });
-    }, [data, navigation, titleOffsetStyle]);
+    }, [data, navigation, route.params.name, titleOffsetStyle]);
 
     useEffect(() => {
         const subscriber = ongoingOpsStore
@@ -128,6 +129,13 @@ export default function Folder() {
             onUpdate={handleUpdateName}
             operations={ongoingOperations}
             onScroll={reanimatedScrollHandler}
+            header={
+                <View className="items-center justify-center p-6">
+                    <Text variant="largeTitle">
+                        {route.params.name || data?.folderById?.name}
+                    </Text>
+                </View>
+            }
         />
     );
 }

@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import clsx from "clsx";
 import { useTheme } from "@react-navigation/native";
+import { CheckIcon } from "react-native-heroicons/outline";
 
 cssInterop(RectButton, { className: "style" });
 
@@ -24,36 +25,45 @@ export default function ListItem(props: {
     onTap?(): void;
     onLongTap?(): void;
     hasActivity?: boolean;
+    selected?: boolean;
+    color?: "error" | "primary";
+    disabled?: boolean;
 }) {
     const theme = useTheme();
     const [title, setTitle] = useState(props.title);
-    const disabled = !(props.onTap || props.onLongTap);
+    const disabled = !(props.onTap || props.onLongTap) || props.disabled;
 
     return (
         <Animated.View
             entering={FadeIn}
             exiting={FadeOut}
             layout={LinearTransition}
-            className={clsx(!(props.onTap || props.onLongTap) && "opacity-50")}
+            className={clsx(props.disabled && "opacity-50")}
         >
             <RectButton
                 onPress={props.onTap}
                 onLongPress={props.onLongTap}
                 enabled={!disabled}
+                //@ts-ignore
                 className="flex flex-row items-center gap-4 p-4 py-3"
             >
                 <View className="h-6 w-6 items-center justify-center">
-                    {props.hasActivity && !props.icon ?
+                    {props.hasActivity ?
                         <ActivityIndicator
                             color={theme.colors.primary}
                             size="small"
                         />
-                    :   props.icon}
+                    :   props.icon && props.icon}
                 </View>
                 <View className="flex flex-1 flex-col">
                     <View>
                         {!props.editing ?
-                            <Text variant="title3">{props.title}</Text>
+                            <Text
+                                variant="title3"
+                                color={props.color}
+                            >
+                                {props.title}
+                            </Text>
                         :   <TextInput
                                 value={title}
                                 onChangeText={setTitle}
@@ -89,6 +99,14 @@ export default function ListItem(props: {
                             </View>
                         )}
                 </View>
+                {props.selected && (
+                    <View>
+                        <CheckIcon
+                            size={20}
+                            color={theme.colors.text}
+                        />
+                    </View>
+                )}
             </RectButton>
         </Animated.View>
     );

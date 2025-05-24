@@ -5,7 +5,7 @@ import { formatBytes } from "@/utils";
 import { Theme, useNavigation, useTheme } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { RefreshControl } from "react-native";
 import {
     ArrowDownTrayIcon,
@@ -23,8 +23,8 @@ import Animated from "react-native-reanimated";
 import ListItem from "../ListItem";
 import ListItemSkeleton from "../ListItemSkeleton";
 import ListDisplayHeader from "./ListDisplayHeader";
-import {NativeSyntheticEvent} from "react-native";
-import {NativeScrollEvent} from "react-native";
+import { NativeSyntheticEvent } from "react-native";
+import { NativeScrollEvent } from "react-native";
 
 type navigationProp = NativeStackNavigationProp<RootStackT, "Home">;
 
@@ -33,6 +33,7 @@ interface ListProps {
     isLoading?: boolean;
     onRefresh?(): void;
     refreshing?: boolean;
+    header?: ReactNode;
     onUpdate?(
         updates: Pick<FileType | FolderType, "id" | "__typename" | "name">,
     ): void;
@@ -45,42 +46,54 @@ export default function List(props: ListProps) {
     const navigation = useNavigation<navigationProp>();
     const [editingId, setEditingId] = useState<string>("");
 
+    const onLongTapHandler = (item: FileType | FolderType) => {
+        const timestamp = dayjs(item.createdAt).format("MMM DD, YYYY");
+        const isFile = item.__typename === "FileType";
+
+        showOptions(baseOptions(theme, isFile ? "File" : "Folder"), {
+            title: item.name,
+            subtitle: timestamp,
+        }).then((response) => {
+            switch (response) {
+                case "rename":
+                    setEditingId(item.id);
+                    break;
+                case "share":
+                    navigation.navigate("Share", {
+                        id: item.id,
+                        type: item.__typename!,
+                    });
+                    break;
+                case "manage-access":
+                    navigation.navigate("ShareManage", { id: item.id });
+                    break;
+            }
+        });
+    };
+
     const renderItem = ({ item }: { item: FolderType | FileType }) => {
         const hasActivity = props.operations?.has(item.id);
-        const timestamp = dayjs(item.createdAt).format("MMM DD, YY");
+        const timestamp = dayjs(item.createdAt).format("MMM DD, YYYY");
         return item.__typename === "FileType" ?
                 <ListItem
                     title={item.name}
                     editing={editingId === item.id}
                     icon={
                         <DocumentIcon
-                            size={24}
+                            size={26}
                             color={theme.colors.text}
                         />
                     }
                     subtitle={timestamp}
                     trailing={formatBytes(item.size, 1)}
-                    onLongTap={async () => {
-                        const response = await showOptions(
-                            baseOptions(theme, "File"),
-                            {
-                                title: item.name,
-                                subtitle: timestamp,
-                            },
-                        );
-                        switch (response) {
-                            case "rename":
-                                setEditingId(item.id);
-                                break;
-                        }
-                    }}
+                    onLongTap={() => onLongTapHandler(item)}
                     onSubmit={(name) => {
-                        setEditingId('');
+                        setEditingId("");
                         if (name.trim() === "") return;
                         props.onUpdate?.({
                             __typename: item.__typename,
                             id: item.id,
-                            name:name.trim(),
+                            name: name.trim(),
                         });
                     }}
                     hasActivity={hasActivity}
@@ -91,30 +104,24 @@ export default function List(props: ListProps) {
                     editing={editingId === item.id}
                     icon={
                         <FolderIcon
-                            size={24}
+                            size={26}
                             color={theme.colors.text}
                         />
                     }
-                    onTap={() => navigation.navigate("Folder", { id: item.id })}
-                    onLongTap={() => {
-                        showOptions(baseOptions(theme, "Folder"), {
-                            title: item.name,
-                            subtitle: timestamp,
-                        }).then((response) => {
-                            switch (response) {
-                                case "rename":
-                                    setEditingId(item.id);
-                                    break;
-                            }
-                        });
-                    }}
+                    onTap={() =>
+                        navigation.navigate("Folder", {
+                            id: item.id,
+                            name: item.name,
+                        })
+                    }
+                    onLongTap={() => onLongTapHandler(item)}
                     onSubmit={(name) => {
-                        setEditingId('');
+                        setEditingId("");
                         if (name.trim() === "") return;
                         props.onUpdate?.({
                             __typename: item.__typename,
                             id: item.id,
-                            name:name.trim(),
+                            name: name.trim(),
                         });
                     }}
                     hasActivity={hasActivity}
@@ -137,7 +144,10 @@ export default function List(props: ListProps) {
             }
             ListHeaderComponent={<ListDisplayHeader />}
             ListFooterComponent={
-                <ListItemSkeleton isLoading={!!props.isLoading} />
+                <>
+                    {props.header}
+                    <ListItemSkeleton isLoading={!!props.isLoading} />
+                </>
             }
         />
     );
@@ -205,20 +215,20 @@ const baseOptions = (theme: Theme, type: "File" | "Folder") => [
         ),
     },
     {
-        label: "Permanently delete",
-        value: "delete",
+        label: `${type} details`,
+        value: "details",
         icon: (
-            <TrashIcon
+            <ExclamationCircleIcon
                 size={20}
                 color={theme.colors.text}
             />
         ),
     },
     {
-        label: `${type} details`,
-        value: "details",
+        label: "Permanently delete",
+        value: "delete",
         icon: (
-            <ExclamationCircleIcon
+            <TrashIcon
                 size={20}
                 color={theme.colors.text}
             />

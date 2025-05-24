@@ -18,7 +18,7 @@ import { UserSettings } from "./screens/UserSettings";
 type RootStackT = {
     SignIn: undefined;
     Home: undefined;
-    Folder: { id: string };
+    Folder: { id: string, name?: string };
     User: undefined;
     UserSettings: undefined;
     Register: undefined;

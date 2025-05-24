@@ -17,7 +17,7 @@ import {
     useRef,
     useState,
 } from "react";
-import { View } from "react-native";
+import { View, Text as RNText } from "react-native";
 import { BehaviorSubject } from "rxjs";
 
 export interface Option<T = unknown> {
@@ -26,9 +26,10 @@ export interface Option<T = unknown> {
     value: T;
 }
 
-interface OptionsConfig {
+interface OptionsConfig<T = unknown> {
     title?: string;
     subtitle?: string;
+    selected?: T;
 }
 
 cssInterop(BottomSheet, {
@@ -44,7 +45,7 @@ let optionsResolver: (<T = any>(value: T) => void) | null = null;
 
 export function showOptions<T>(
     items: Option<T>[],
-    config?: OptionsConfig,
+    config?: OptionsConfig<T>,
 ): Promise<T | null> {
     return new Promise((resolve) => {
         //@ts-ignore
@@ -164,10 +165,13 @@ const OptionsManagerLayout: FC<PropsWithChildren> = ({ children }) => {
                                 icon={item.icon}
                                 key={`${index}-item`}
                                 onTap={() => handleSelection(item.value)}
+                                selected={
+                                    dialogData.config?.selected === item.value
+                                }
                             />
                         ))}
                     </View>
-                    <Text />
+                    <RNText className="text-[1px]" />
                 </BottomSheetView>
             </BottomSheet>
             <AlertDialog

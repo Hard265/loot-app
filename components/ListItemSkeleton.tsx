@@ -1,10 +1,13 @@
+import { useTheme } from "@react-navigation/native";
 import Skeleton from "react-native-reanimated-skeleton";
+import colors from "tailwindcss/colors";
 
 export default function ListItemSkeleton({
     isLoading,
 }: {
     isLoading: boolean;
 }) {
+    const theme = useTheme();
     return (
         <Skeleton
             isLoading={isLoading}
@@ -13,6 +16,10 @@ export default function ListItemSkeleton({
                 padding: 16,
                 gap: 16,
             }}
+            highlightColor={
+                theme.dark ? colors.neutral[700] : colors.neutral[300]
+            }
+            boneColor={theme.dark ? colors.neutral[900] : colors.neutral[200]}
             layout={[
                 {
                     width: 32,

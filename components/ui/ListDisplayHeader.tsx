@@ -6,6 +6,8 @@ import {
     ArrowDownIcon,
     Squares2X2Icon,
     ListBulletIcon,
+    ScaleIcon,
+    Bars2Icon,
 } from "react-native-heroicons/outline";
 import Text from "../Text";
 
@@ -16,34 +18,59 @@ export default function ListDisplayHeader() {
         <View className="flex-row items-center justify-between bg-background p-4">
             <Pressable
                 onPress={() => {
-                    showOptions([
+                    showOptions(
+                        [
+                            {
+                                label: "Name",
+                                value: "name",
+                                icon: (
+                                    <Bars2Icon
+                                        size={20}
+                                        color={colors.text}
+                                    />
+                                ),
+                            },
+                            {
+                                label: "Size",
+                                value: "size",
+                                icon: (
+                                    <ScaleIcon
+                                        size={20}
+                                        color={colors.text}
+                                    />
+                                ),
+                            },
+                            {
+                                label: "Date modified",
+                                value: "dateModified",
+                                icon: (
+                                    <CalendarDaysIcon
+                                        size={20}
+                                        color={colors.text}
+                                    />
+                                ),
+                            },
+                            {
+                                label: "Date created",
+                                value: "dateCreated",
+                                icon: (
+                                    <CalendarDaysIcon
+                                        size={20}
+                                        color={colors.text}
+                                    />
+                                ),
+                            },
+                        ],
                         {
-                            label: "Size",
-                            value: "size",
-                            icon: (
-                                <CalendarDaysIcon
-                                    size={24}
-                                    color={colors.text}
-                                />
-                            ),
+                            selected: "name",
                         },
-                        {
-                            label: "Date Modified",
-                            value: "dateModified",
-                            icon: (
-                                <CalendarDaysIcon
-                                    size={24}
-                                    color={colors.text}
-                                />
-                            ),
-                        },
-                    ]);
+                    );
                 }}
                 className="flex-row items-center gap-2 bg-background"
             >
                 <Text variant="title3">Name</Text>
                 <ArrowDownIcon
-                    size={16}
+                    size={18}
                     color={colors.text}
                 />
             </Pressable>
@@ -55,7 +82,7 @@ export default function ListDisplayHeader() {
                             value: "grid",
                             icon: (
                                 <Squares2X2Icon
-                                    size={24}
+                                    size={20}
                                     color={colors.text}
                                 />
                             ),
@@ -65,7 +92,7 @@ export default function ListDisplayHeader() {
                             value: "list",
                             icon: (
                                 <ListBulletIcon
-                                    size={24}
+                                    size={20}
                                     color={colors.text}
                                 />
                             ),
@@ -74,7 +101,7 @@ export default function ListDisplayHeader() {
                 }}
             >
                 <Squares2X2Icon
-                    size={20}
+                    size={24}
                     color={colors.text}
                 />
             </Pressable>
