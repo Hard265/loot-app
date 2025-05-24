@@ -1,19 +1,18 @@
 import { createStaticNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import SignedOutHeaderRight from "./components/ui/SignedOutHeaderRight";
 import { useIsSignedIn, useIsSignedOut } from "./hooks/useIsSigned";
-import ItemContextLayout from "./layouts/ItemContextLayout";
-import PlusFabLayout from "./layouts/PlusFabLayout";
 import OptionsManagerLayout from "./layouts/OptionsManagerLayout";
+import PlusFabLayout from "./layouts/PlusFabLayout";
+import ShareScreenLayout from "./layouts/ShareScreenLayout";
 import Folder from "./screens/Folder";
 import Home from "./screens/Home";
 import PasswordReset from "./screens/PasswordReset";
 import Register from "./screens/Register";
 import ShareScreen from "./screens/Share";
+import ShareManage from "./screens/ShareManage";
 import SignIn from "./screens/SignIn";
 import User from "./screens/User";
-import SignedOutHeaderRight from "./components/ui/SignedOutHeaderRight";
-import ShareManage from "./screens/ShareManage";
-import ShareScreenLayout from "./layouts/ShareScreenLayout";
 import { UserSettings } from "./screens/UserSettings";
 
 type RootStackT = {
@@ -87,7 +86,7 @@ const RootStack = createNativeStackNavigator({
     layout: (props) => {
         return OptionsManagerLayout({
             //@ts-ignore
-            children: ItemContextLayout({ children: PlusFabLayout(props) }),
+            children: PlusFabLayout(props),
         });
     },
 });

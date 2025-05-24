@@ -1,3 +1,13 @@
+import AlertDialog from "@/components/AlertDialog";
+import ListItem from "@/components/ListItem";
+import Text from "@/components/Text";
+import useBackHandler from "@/hooks/useBackHandler";
+import BottomSheet, {
+    BottomSheetBackdrop,
+    BottomSheetBackdropProps,
+    BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { cssInterop } from "nativewind";
 import {
     FC,
     PropsWithChildren,
@@ -7,17 +17,8 @@ import {
     useRef,
     useState,
 } from "react";
-import { BehaviorSubject } from "rxjs";
 import { View } from "react-native";
-import BottomSheet, {
-    BottomSheetBackdrop,
-    BottomSheetBackdropProps,
-    BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import useBackHandler from "@/hooks/useBackHandler";
-import ListItem from "@/components/ListItem";
-import Text from "@/components/Text";
-import { cssInterop } from "nativewind";
+import { BehaviorSubject } from "rxjs";
 
 export interface Option<T = unknown> {
     label: string;
@@ -27,6 +28,7 @@ export interface Option<T = unknown> {
 
 interface OptionsConfig {
     title?: string;
+    subtitle?: string;
 }
 
 cssInterop(BottomSheet, {
@@ -56,6 +58,19 @@ export const hideOptions = () => {
     optionsSubject.next(null);
 };
 
+type AlertAction = { text: string };
+type AlertConfig = { title: string; message: string; actions: AlertAction[] };
+
+const alertSubject = new BehaviorSubject<AlertConfig | null>(null);
+let alertResolver: ((value: number | null) => void) | null = null;
+
+export function alert(config: AlertConfig): Promise<number | null> {
+    return new Promise((resolve) => {
+        alertResolver = resolve;
+        alertSubject.next(config);
+    });
+}
+
 const OptionsManagerLayout: FC<PropsWithChildren> = ({ children }) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [isVisible, setIsVisible] = useState(false);
@@ -63,6 +78,8 @@ const OptionsManagerLayout: FC<PropsWithChildren> = ({ children }) => {
         items: Option[];
         config?: OptionsConfig;
     } | null>(null);
+    const [alertData, setAlertData] = useState<AlertConfig | null>(null);
+    const [alertVisible, setAlertVisible] = useState(false);
 
     useBackHandler(isVisible, () => {
         hideOptions();
@@ -70,7 +87,14 @@ const OptionsManagerLayout: FC<PropsWithChildren> = ({ children }) => {
 
     useEffect(() => {
         const subscription = optionsSubject.subscribe(setDialogData);
-        return () => subscription.unsubscribe();
+        const alertSub = alertSubject.subscribe((data) => {
+            setAlertData(data);
+            setAlertVisible(!!data);
+        });
+        return () => {
+            subscription.unsubscribe();
+            alertSub.unsubscribe();
+        };
     }, []);
 
     useEffect(() => {
@@ -97,6 +121,14 @@ const OptionsManagerLayout: FC<PropsWithChildren> = ({ children }) => {
         hideOptions();
     };
 
+    const handleAlertAction = (idx: number | null) => {
+        setAlertVisible(false);
+        setTimeout(() => {
+            alertSubject.next(null);
+            if (alertResolver) alertResolver(idx);
+        }, 0);
+    };
+
     return (
         <>
             {children}
@@ -113,10 +145,16 @@ const OptionsManagerLayout: FC<PropsWithChildren> = ({ children }) => {
             >
                 <BottomSheetView>
                     {dialogData?.config?.title && (
-                        <View>
-                            <Text variant="title2">
+                        <View className="flex flex-col items-start p-4 pt-0.5">
+                            <Text
+                                variant="largeTitle"
+                                singleLine
+                            >
                                 {dialogData.config.title}
                             </Text>
+                            {dialogData.config.subtitle && (
+                                <Text>{dialogData.config.subtitle}</Text>
+                            )}
                         </View>
                     )}
                     <View>
@@ -132,6 +170,11 @@ const OptionsManagerLayout: FC<PropsWithChildren> = ({ children }) => {
                     <Text />
                 </BottomSheetView>
             </BottomSheet>
+            <AlertDialog
+                alertVisible={alertVisible}
+                handleAlertAction={handleAlertAction}
+                alertData={alertData}
+            />
         </>
     );
 };

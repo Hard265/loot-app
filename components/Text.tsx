@@ -5,7 +5,7 @@ import { Text as RNText } from "react-native";
 const variants = {
     largeTitle: "text-4xl leading-[48px] font-[RoobertBold]",
     title1: "text-2xl",
-    title2: "text-[22px] leading-7",
+    title2: "text-xl font-[MontrealMedium] leading-7",
     title3: "text-xl font-[MontrealRegular]",
     heading: "text-[17px] text-text leading-6 font-semibold",
     body: "text-[16px] font-[MontrealRegular] leading-6",

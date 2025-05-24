@@ -207,7 +207,6 @@ export default function Share() {
                             {
                                 key: Math.random().toString(16),
                                 height: "100%",
-
                                 width: "40%",
                             },
                         ],
